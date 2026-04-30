@@ -33,3 +33,4 @@ app.include_router(parents.router)
 @app.get("/")
 def read_root():
     return {"message": "Server is running! Check /docs"}
+# Тестовый комментарий для проверки Pull Request
