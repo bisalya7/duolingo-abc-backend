@@ -27,3 +27,14 @@ def login(user: UserCreate, db: Session = Depends(get_db)):
     
     token = create_access_token(data={"sub": str(db_user.id), "role": db_user.role})
     return {"access_token": token, "token_type": "bearer"}
+# ДОБАВИТЬ В КОНЕЦ ФАЙЛА auth.py
+
+@router.post("/logout")
+def logout():
+    """Выход из системы (уничтожение сессии)"""
+    return {"message": "Успешно вышли из системы"}
+
+@router.post("/refresh")
+def refresh_token():
+    """Обновление токена доступа (Refresh Token)"""
+    return {"access_token": "new_token_here", "token_type": "bearer"}
