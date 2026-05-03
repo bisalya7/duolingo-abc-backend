@@ -2,39 +2,32 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models import User
-from schemas import UserCreate, Token
-from services.auth_service import hash_password, verify_password, create_access_token
-from schemas import UserCreate, Token
+from schemas import UserCreate
 
-router = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
+# БЕЗ всяких префиксов, просто чистые пути
+router = APIRouter(tags=["Auth"])
 
 @router.post("/register")
-def register(user: UserCreate, db: Session = Depends(get_db)):
+def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    # Проверяем, есть ли такой email
     db_user = db.query(User).filter(User.email == user.email).first()
     if db_user:
-        raise HTTPException(status_code=400, detail="Email уже зарегистрирован")
+        raise HTTPException(status_code=400, detail="Этот email уже зарегистрирован")
     
-    new_user = User(email=user.email, password_hash=hash_password(user.password))
+    # Создаем пользователя (в реальном проекте тут нужно хэшировать пароль!)
+    new_user = User(email=user.email, password_hash=user.password)
     db.add(new_user)
     db.commit()
-    return {"message": "Пользователь успешно создан"}
-
-@router.post("/login", response_model=Token)
-def login(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.email == user.email).first()
-    if not db_user or not verify_password(user.password, db_user.password_hash):
-        raise HTTPException(status_code=401, detail="Неверный email или пароль")
+    db.refresh(new_user)
     
-    token = create_access_token(data={"sub": str(db_user.id), "role": db_user.role})
-    return {"access_token": token, "token_type": "bearer"}
-# ДОБАВИТЬ В КОНЕЦ ФАЙЛА auth.py
+    return {"message": "Успешная регистрация", "user_id": new_user.id}
 
-@router.post("/logout")
-def logout():
-    """Выход из системы (уничтожение сессии)"""
-    return {"message": "Успешно вышли из системы"}
-
-@router.post("/refresh")
-def refresh_token():
-    """Обновление токена доступа (Refresh Token)"""
-    return {"access_token": "new_token_here", "token_type": "bearer"}
+@router.post("/login")
+def login_user(user: UserCreate, db: Session = Depends(get_db)):
+    # Простейшая проверка (потом добавишь токены)
+    db_user = db.query(User).filter(User.email == user.email).first()
+    if not db_user or db_user.password_hash != user.password:
+        raise HTTPException(status_code=400, detail="Неверный email или пароль")
+    
+    # Пока возвращаем заглушку токена для тестов
+    return {"access_token": "fake-super-secret-token", "token_type": "bearer"}

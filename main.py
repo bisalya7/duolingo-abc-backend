@@ -1,19 +1,15 @@
-import models
-from fastapi import FastAPI
+import models, schemas
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from database import engine, Base
-from schemas import UserCreate, Token 
+from sqlalchemy.orm import Session
+from database import engine, get_db
+from datetime import date, timedelta
+from routers import auth, children, learning, admin, parents
 
-# Импортируем все наши роутеры из папки routers
-from routers import auth, children, learning, admin, parents 
-
-# Создаем таблицы в базе данных (если их еще нет)
 models.Base.metadata.create_all(bind=engine)
 
-# 1. СНАЧАЛА СОЗДАЕМ ПРИЛОЖЕНИЕ
-app = FastAPI(title="Duolingo ABC Clone API")
+app = FastAPI()
 
-# 2. НАСТРАИВАЕМ CORS (обязательно для работы с React/Vue)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,15 +18,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 3. ПОДКЛЮЧАЕМ ВСЕ РОУТЕРЫ (Только после создания app!)
+# Подключаем роутеры БЕЗ двойных префиксов
 app.include_router(auth.router)
 app.include_router(children.router)
 app.include_router(learning.router)
-app.include_router(admin.router)
-app.include_router(parents.router)
 
-# 4. БАЗОВЫЙ ЭНДПОИНТ (Проверка, что сервер жив)
-@app.get("/")
-def read_root():
-    return {"message": "Server is running! Check /docs"}
-# Тестовый комментарий для проверки Pull Request
+@app.post("/children/{child_id}/progress", response_model=schemas.ChildResponse)
+def update_child_progress(child_id: int, progress: schemas.ProgressUpdate, db: Session = Depends(get_db)):
+    child = db.query(models.Child).filter(models.Child.id == child_id).first()
+    if not child:
+        raise HTTPException(status_code=404, detail="Child not found")
+    
+    # Защита от NULL (для Postgres)
+    child.total_xp = (child.total_xp or 0) + progress.xp_added
+    child.level = (child.total_xp // 50) + 1
+    
+    db.commit()
+    db.refresh(child)
+    return child

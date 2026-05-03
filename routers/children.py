@@ -4,12 +4,21 @@ from database import get_db
 from models import Child, User
 from schemas import ChildCreate, ChildResponse
 from services.auth_service import get_current_user
-
-router = APIRouter(prefix="/api/v1/children", tags=["Children"])
+from models import ChildBadge
+from models import Progress
+router = APIRouter(prefix="/children", tags=["Children"])
 
 @router.post("/", response_model=ChildResponse)
 def create_child(child: ChildCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    new_child = Child(name=child.name, age=child.age, parent_id=current_user.id)
+    # Явно указываем начальные значения, чтобы Postgres и Pydantic были довольны
+    new_child = Child(
+        name=child.name, 
+        age=child.age, 
+        parent_id=current_user.id,
+        total_xp=0,
+        level=1,
+        daily_streak=0
+    )
     db.add(new_child)
     db.commit()
     db.refresh(new_child)
@@ -17,8 +26,7 @@ def create_child(child: ChildCreate, db: Session = Depends(get_db), current_user
 
 @router.get("/", response_model=list[ChildResponse])
 def get_my_children(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    children = db.query(Child).filter(Child.parent_id == current_user.id).all()
-    return children
+    return db.query(Child).filter(Child.parent_id == current_user.id).all()
 # ДОБАВИТЬ В КОНЕЦ ФАЙЛА children.py
 
 @router.get("/{child_id}")
@@ -37,11 +45,38 @@ def delete_child(child_id: int):
     return {"message": "Профиль удален"}
 
 @router.get("/{child_id}/progress")
-def get_child_progress(child_id: int):
+def get_child_progress(child_id: int, db: Session = Depends(get_db)):
     """Получить историю уроков для графиков родителя (Progress)"""
-    return {"lessons_completed": 10, "accuracy": 95}
+    
+    # Достаем все записи о пройденных уроках для этого ребенка, сортируем по дате
+    progress_records = db.query(Progress).filter(Progress.child_id == child_id).order_by(Progress.completed_at.asc()).all()
+    
+    history = []
+    for p in progress_records:
+        history.append({
+            "lesson_id": p.lesson_id,
+            "lesson_title": p.lesson.title, # SQLAlchemy сама подтянет название урока по связи
+            "score": p.score, # Звездочки за урок (например, 3 из 3)
+            "completed_at": p.completed_at
+        })
+        
+    return {
+        "total_completed_lessons": len(progress_records),
+        "history": history
+    }
 
 @router.get("/{child_id}/badges")
-def get_child_badges(child_id: int):
-    """Получить заработанные награды и бейджи"""
-    return [{"badge": "Первая кровь... ой, Первая буква!", "icon": "star"}]
+def get_child_badges(child_id: int, db: Session = Depends(get_db)):
+    """Получить заработанные награды и бейджи из базы данных"""
+    child_badges = db.query(ChildBadge).filter(ChildBadge.child_id == child_id).all()
+    
+    result = []
+    for cb in child_badges:
+        result.append({
+            "id": cb.badge.id,
+            "name": cb.badge.name,
+            "description": cb.badge.description,
+            "icon_url": cb.badge.icon_url,
+            "earned_at": cb.earned_at
+        })
+    return result
