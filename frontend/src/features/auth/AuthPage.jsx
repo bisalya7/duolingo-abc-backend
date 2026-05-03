@@ -4,79 +4,103 @@ import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true); // Переключатель: Вход / Регистрация
+  const [isLogin, setIsLogin] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const login = useAuthStore((state) => state.login);
-
-  // Подключаем react-hook-form для удобной валидации
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
     setErrorMsg('');
     try {
       if (isLogin) {
-        // Запрос на логин
-        const response = await api.post('/auth/login', data);
-        login(response.data.access_token); // Сохраняем токен в Zustand и localStorage
+        const response = await api.login(data);
+        login(response.access_token);
       } else {
-        // Запрос на регистрацию
-        await api.post('/auth/register', data);
-        setIsLogin(true); // После регистрации перекидываем на логин
+        await api.register(data);
+        setIsLogin(true);
         alert('Успешная регистрация! Теперь войдите в систему.');
       }
     } catch (error) {
-      setErrorMsg(error.response?.data?.detail || 'Произошла ошибка');
+      const rawDetail = error.response?.data?.detail;
+      let message = 'Произошла ошибка';
+
+      if (typeof rawDetail === 'string') {
+        message = rawDetail;
+      } else if (Array.isArray(rawDetail) && rawDetail.length > 0) {
+        // ✅ Исправлено: Array.isArray вместо Array.items
+        message = rawDetail[0].msg;
+      } else if (error.message) {
+        message = error.message;
+      }
+
+      setErrorMsg(message);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md border-4 border-secondary/20">
-        <h1 className="text-3xl font-bold text-center text-secondary mb-6">
-          {isLogin ? 'Вход для родителей' : 'Регистрация'}
-        </h1>
+    <div className="min-h-screen bg-[#F0F4F8] flex items-center justify-center p-4 font-sans">
+      <div className="bg-white rounded-[32px] shadow-[0_10px_0_0_#e5e5e5] p-10 w-full max-w-md border-2 border-[#e5e5e5]">
+
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-2">🦉</div>
+          <h1 className="text-3xl font-black text-[#3c3c3c] tracking-tight">
+            {isLogin ? 'С возвращением!' : 'Создать аккаунт'}
+          </h1>
+          <p className="text-gray-400 font-bold mt-2">Родительский контроль</p>
+        </div>
 
         {errorMsg && (
-          <div className="bg-primary/10 text-primary p-3 rounded-xl mb-4 text-center font-bold">
+          <div className="bg-red-100 border-2 border-red-200 text-red-500 p-4 rounded-2xl mb-6 text-center font-bold">
             {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-gray-700 font-bold mb-2">Email</label>
-            <input 
+            <input
               type="email"
-              className="w-full p-3 rounded-xl border-2 border-gray-200 focus:border-secondary outline-none transition-colors"
-              {...register("email", { required: "Email обязателен" })}
+              placeholder="Электронная почта"
+              className="w-full p-4 rounded-2xl bg-[#f7f7f7] border-2 border-[#e5e5e5] focus:border-[#1cb0f6] outline-none transition-all font-bold text-[#4b4b4b] placeholder:text-[#afafaf]"
+              {...register("email", { required: "Введите почту" })}
             />
-            {errors.email && <p className="text-primary text-sm mt-1">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-sm font-bold mt-1 ml-2">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-gray-700 font-bold mb-2">Пароль</label>
-            <input 
+            <input
               type="password"
-              className="w-full p-3 rounded-xl border-2 border-gray-200 focus:border-secondary outline-none transition-colors"
-              {...register("password", { required: "Пароль обязателен", minLength: { value: 4, message: "Минимум 4 символа" } })}
+              placeholder="Пароль"
+              className="w-full p-4 rounded-2xl bg-[#f7f7f7] border-2 border-[#e5e5e5] focus:border-[#1cb0f6] outline-none transition-all font-bold text-[#4b4b4b] placeholder:text-[#afafaf]"
+              {...register("password", { required: "Введите пароль", minLength: { value: 6, message: "Минимум 6 символов" } })}
             />
-            {errors.password && <p className="text-primary text-sm mt-1">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-sm font-bold mt-1 ml-2">
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
-          <button 
-            type="submit" 
-            className="w-full bg-secondary text-white font-bold py-4 rounded-2xl hover:bg-blue-500 transition-transform active:scale-95 text-lg"
+          <button
+            type="submit"
+            className="w-full bg-[#1cb0f6] hover:bg-[#1499d3] text-white font-black py-4 rounded-2xl shadow-[0_5px_0_0_#1899d6] active:shadow-none active:translate-y-[5px] transition-all text-lg uppercase tracking-wider"
           >
-            {isLogin ? 'Войти' : 'Зарегистрироваться'}
+            {isLogin ? 'Войти' : 'Начать'}
           </button>
         </form>
 
-        <button 
-          onClick={() => setIsLogin(!isLogin)}
-          className="w-full text-center mt-6 text-gray-500 hover:text-secondary font-semibold"
-        >
-          {isLogin ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти'}
-        </button>
+        <div className="mt-8 pt-6 border-t-2 border-[#e5e5e5]">
+          <button
+            type="button"
+            onClick={() => { setIsLogin(!isLogin); setErrorMsg(''); }}
+            className="w-full text-[#1cb0f6] font-black uppercase tracking-widest text-sm hover:brightness-90 transition-all"
+          >
+            {isLogin ? 'Зарегистрироваться' : 'У меня есть аккаунт'}
+          </button>
+        </div>
       </div>
     </div>
   );

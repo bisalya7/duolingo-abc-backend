@@ -1,39 +1,130 @@
-from database import SessionLocal, engine, Base
-from models import Unit, Lesson, Exercise, Badge
+import json
+from database import SessionLocal, engine
+from models import Base, Unit, Lesson, Exercise, Badge
 
-# Создаем таблицы, если их нет
-Base.metadata.create_all(bind=engine)
-db = SessionLocal()
+def seed_database():
+    db = SessionLocal()
+    
+    try:
+        # Проверяем, есть ли уже данные
+        if db.query(Badge).first():
+            print("База данных уже содержит данные. Пропускаем наполнение.")
+            return
 
-# 1. Добавляем бейджи
-if db.query(Badge).count() == 0:
-    b1 = Badge(name="Первый урок", description="Молодец! Ты прошел свой самый первый урок.", icon_url="medal_first.png")
-    b2 = Badge(name="100 XP", description="Ого! Ты накопил целых 100 очков опыта.", icon_url="cup_gold.png")
-    db.add_all([b1, b2])
-    db.commit()
-    print("Бейджи успешно добавлены!")
+        print("Начинаем наполнение базы данных...")
 
-# 2. Добавляем уроки (как было у тебя)
-if db.query(Unit).count() == 0:
-    unit1 = Unit(title="Уровень 1: Знакомство с буквами", order=1)
-    db.add(unit1)
-    db.commit() # Сохраняем, чтобы получить unit1.id
+        # 1. Создаем бейджи
+        badges = [
+            Badge(name="Первооткрыватель", description="Получи 1 уровень!", icon_url="🌟"),
+            Badge(name="Умник", description="Достигни 5 уровня", icon_url="🧠"),
+            Badge(name="Огонек", description="Занимайся 3 дня подряд", icon_url="🔥"),
+            Badge(name="Марафонец", description="Занимайся 7 дней подряд", icon_url="⚡"),
+        ]
+        db.add_all(badges)
+        db.commit()
+        print("✅ Бейджи добавлены")
 
-    lesson1 = Lesson(title="Буква А", order=1, xp_reward=20, unit_id=unit1.id)
-    db.add(lesson1)
-    db.commit() # Сохраняем, чтобы получить lesson1.id
+        # 2. Создаем Юниты
+        unit1 = Unit(title="Алфавит: А, О, У", order=1)
+        unit2 = Unit(title="Первые слоги", order=2)
+        db.add_all([unit1, unit2])
+        db.commit()
+        print("✅ Юниты добавлены")
 
-    ex1 = Exercise(
-        type="multiple_choice",
-        content={
-            "question": "Найди букву А",
-            "options": ["А", "Б", "В"],
-            "correct": "А"
-        },
-        lesson_id=lesson1.id
-    )
-    db.add(ex1)
-    db.commit()
-    print("База успешно наполнена контентом (Уроки и Задания)!")
+        # 3. Создаем Уроки
+        lesson1 = Lesson(unit_id=unit1.id, title="Буква А", order=1)
+        lesson2 = Lesson(unit_id=unit1.id, title="Буква О", order=2)
+        lesson3 = Lesson(unit_id=unit2.id, title="Слоги МА и ПА", order=1)
+        db.add_all([lesson1, lesson2, lesson3])
+        db.commit()
+        print("✅ Уроки добавлены")
 
-db.close()
+        # 4. Создаем Упражнения (УБРАЛИ ПОЛЕ answer)
+        exercises = [
+            # === УРОК 1 ===
+            Exercise(lesson_id=lesson1.id, type="match", content=json.dumps({
+                "question": "Найди букву А", 
+                "options": ["Б", "А", "В"],
+                "correct_answer": "А"
+            })),
+            
+            Exercise(lesson_id=lesson1.id, type="listen", content=json.dumps({
+                "text": "Послушай и нажми на правильную букву", 
+                "audio_url": "/sounds/a.mp3", 
+                "options": ["О", "У", "А"],
+                "correct_answer": "А"
+            })),
+            
+            Exercise(lesson_id=lesson1.id, type="select_image", content=json.dumps({
+                "question": "Что начинается на звук 'А'?", 
+                "options": [
+                    {"icon": "🍉", "word": "Арбуз"}, 
+                    {"icon": "🍌", "word": "Банан"}, 
+                    {"icon": "🐱", "word": "Кот"}
+                ],
+                "correct_answer": "Арбуз"
+            })),
+
+            # === УРОК 2 ===
+            Exercise(lesson_id=lesson2.id, type="match", content=json.dumps({
+                "question": "Найди букву О", 
+                "options": ["А", "О", "У"],
+                "correct_answer": "О"
+            })),
+            
+            Exercise(lesson_id=lesson2.id, type="listen", content=json.dumps({
+                "text": "Какой звук ты слышишь?", 
+                "audio_url": "/sounds/o.mp3", 
+                "options": ["А", "И", "О"],
+                "correct_answer": "О"
+            })),
+            
+            Exercise(lesson_id=lesson2.id, type="select_image", content=json.dumps({
+                "question": "Где спряталась буква О?", 
+                "options": [
+                    {"icon": "☁️", "word": "Облако"}, 
+                    {"icon": "☀️", "word": "Солнце"}, 
+                    {"icon": "🌲", "word": "Дерево"}
+                ],
+                "correct_answer": "Облако"
+            })),
+
+            # === УРОК 3 ===
+            Exercise(lesson_id=lesson3.id, type="match", content=json.dumps({
+                "question": "Где написан слог МА?", 
+                "options": ["ПА", "БА", "МА"],
+                "correct_answer": "МА"
+            })),
+            
+            Exercise(lesson_id=lesson3.id, type="build_word", content=json.dumps({
+                "question": "Собери слово МАМА", 
+                "parts": ["МА", "ПА", "БА", "МА"],
+                "correct_answer": "МАМА"
+            })),
+            
+            Exercise(lesson_id=lesson3.id, type="select_image", content=json.dumps({
+                "question": "Кто это?", 
+                "image": "👨", 
+                "options": ["МАМА", "ПАПА", "БАБА"],
+                "correct_answer": "ПАПА"
+            })),
+        ]
+        
+        db.add_all(exercises)
+        db.commit()
+        print(f"✅ Добавлено {len(exercises)} разнообразных упражнений!")
+        print("🎉 База данных успешно наполнена стартовым контентом!")
+
+    except Exception as e:
+        print(f"❌ Ошибка при наполнении базы: {e}")
+        db.rollback()
+    finally:
+        db.close()
+
+if __name__ == "__main__":
+    # Сначала удаляем старые таблицы, чтобы сбросить неудачную попытку
+    Base.metadata.drop_all(bind=engine)
+    # Создаем таблицы заново
+    Base.metadata.create_all(bind=engine)
+    
+    seed_database()

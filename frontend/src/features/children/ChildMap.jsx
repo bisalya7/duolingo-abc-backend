@@ -1,76 +1,231 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { api } from '../../services/api';
-import { ArrowLeft, Star, PlayCircle } from 'lucide-react';
+import { ArrowLeft, Star, Lock, PlayCircle, Flame } from 'lucide-react';
 
 export default function ChildMap() {
-  const { childId } = useParams(); // Получаем ID ребенка из адресной строки
+  const { childId } = useParams();
   const navigate = useNavigate();
+
+  const [child, setChild] = useState(null);
   const [lessons, setLessons] = useState([]);
+  const [completedIds, setCompletedIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Временно используем заглушку, пока не настроим реальный эндпоинт уроков
-    setLessons([
-      { id: 1, title: "Буква А", isLocked: false },
-      { id: 2, title: "Буква О", isLocked: true },
-      { id: 3, title: "Слово МАМА", isLocked: true },
-    ]);
-    setLoading(false);
-  }, []);
+    loadData();
+  }, [childId]);
 
-  if (loading) return <div className="text-4xl text-center mt-20 font-extrabold text-secondary animate-bounce">Грузим игру...</div>;
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Параллельно загружаем данные ребёнка, уроки и прогресс
+      const [childData, lessonsData, progressData] = await Promise.all([
+        api.getChild(childId),
+        api.getLessons(),
+        api.getChildProgress(childId),
+      ]);
+
+      setChild(childData);
+
+      // Собираем Set из ID пройденных уроков
+      const done = new Set(
+        (progressData.history || []).map((p) => p.lesson_id)
+      );
+      setCompletedIds(done);
+
+      // Помечаем уроки: completed / available / locked
+      const lessonsList = (lessonsData.items || lessonsData || []).map((lesson, index) => {
+        const isCompleted = done.has(lesson.id);
+        // Разблокирован если: первый, или предыдущий пройден
+        const prevLesson = index > 0 ? lessonsData.items?.[index - 1] || lessonsData[index - 1] : null;
+        const isLocked = index > 0 && !done.has(prevLesson?.id);
+
+        return { ...lesson, isCompleted, isLocked };
+      });
+
+      setLessons(lessonsList);
+    } catch (e) {
+      setError('Не удалось загрузить уроки. Проверь подключение.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- Loading ---
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#ddf4ff] to-[#b8e8ff] flex flex-col items-center justify-center gap-4">
+        <motion.div
+          animate={{ y: [0, -15, 0] }}
+          transition={{ repeat: Infinity, duration: 1 }}
+          className="text-8xl"
+        >
+          🦉
+        </motion.div>
+        <p className="text-2xl font-black text-[#1cb0f6]">Загружаем карту...</p>
+      </div>
+    );
+  }
+
+  // --- Error ---
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#ddf4ff] to-[#b8e8ff] flex flex-col items-center justify-center gap-6 p-6 text-center">
+        <div className="text-8xl">😿</div>
+        <p className="text-2xl font-black text-[#FF4B4B]">{error}</p>
+        <button
+          onClick={loadData}
+          className="bg-[#1cb0f6] text-white font-black px-10 py-4 rounded-2xl shadow-[0_5px_0_0_#1499d3] active:shadow-none active:translate-y-[5px] transition-all text-lg"
+        >
+          Попробовать снова
+        </button>
+      </div>
+    );
+  }
+
+  // --- Empty ---
+  if (lessons.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#ddf4ff] to-[#b8e8ff] flex flex-col items-center justify-center gap-6 p-6 text-center">
+        <div className="text-8xl">🏗️</div>
+        <p className="text-2xl font-black text-[#3c3c3c]">Уроки ещё готовятся!</p>
+        <p className="text-gray-400 font-bold">Скоро здесь появятся задания</p>
+        <button
+          onClick={() => navigate('/select')}
+          className="flex items-center gap-2 text-[#1cb0f6] font-black"
+        >
+          <ArrowLeft size={20} /> Назад
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-blue-50 p-6 flex flex-col items-center">
-      {/* Детская шапка */}
-      <div className="w-full max-w-2xl flex justify-between items-center mb-10 bg-white p-4 rounded-[2rem] shadow-lg border-4 border-blue-200">
-        <button 
-          onClick={() => navigate('/dashboard')}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-700 p-4 rounded-full transition-transform active:scale-90"
-        >
-          <ArrowLeft size={32} />
-        </button>
-        <h1 className="text-3xl font-black text-secondary uppercase tracking-widest">Карта уроков</h1>
-        <div className="bg-warning text-white px-6 py-3 rounded-full font-black text-xl flex items-center gap-2 border-b-4 border-yellow-600">
-          <Star size={28} className="fill-white" /> 0
+    <div className="min-h-screen bg-gradient-to-b from-[#ddf4ff] to-[#b8e8ff] flex flex-col items-center pb-16">
+
+      {/* Шапка */}
+      <div className="w-full max-w-lg px-4 pt-6 pb-4 sticky top-0 z-10 bg-gradient-to-b from-[#ddf4ff] to-transparent">
+        <div className="bg-white/90 backdrop-blur rounded-[2rem] p-4 shadow-lg border-2 border-white flex items-center justify-between">
+
+          <button
+            onClick={() => navigate('/select')}
+            className="bg-gray-100 hover:bg-gray-200 p-3 rounded-full transition-all active:scale-90"
+          >
+            <ArrowLeft size={28} className="text-gray-600" />
+          </button>
+
+          {child && (
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{child.avatar || '🐱'}</span>
+              <div className="text-center">
+                <p className="font-black text-[#3c3c3c] text-lg leading-none">{child.name}</p>
+                <p className="text-xs text-gray-400 font-bold">Уровень {child.level}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            {/* XP */}
+            <div className="bg-[#fff4e0] border-2 border-[#ffd200] text-[#b38600] px-3 py-2 rounded-2xl font-black text-sm flex items-center gap-1">
+              ⭐ {child?.total_xp || 0}
+            </div>
+            {/* Стрик */}
+            {child?.daily_streak > 0 && (
+              <div className="bg-orange-50 border-2 border-orange-300 text-orange-500 px-3 py-2 rounded-2xl font-black text-sm flex items-center gap-1">
+                <Flame size={16} /> {child.daily_streak}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Игровой путь (Nodes) */}
-      <div className="flex flex-col items-center gap-8 relative w-full max-w-md mt-10">
-        {/* Декоративная линия пути */}
-        <div className="absolute top-0 bottom-0 w-4 bg-blue-200 -z-10 rounded-full left-1/2 -translate-x-1/2"></div>
+      {/* Заголовок карты */}
+      <div className="text-center my-6">
+        <h1 className="text-3xl font-black text-[#1cb0f6] drop-shadow-sm">Карта уроков</h1>
+        <p className="text-[#5a8a9f] font-bold mt-1">
+          Пройдено: {completedIds.size} из {lessons.length}
+        </p>
+      </div>
 
-        {lessons.map((lesson, index) => {
-          // Чередуем кнопки влево-вправо для эффекта "змейки"
-          const offsetClass = index % 2 === 0 ? '-ml-24' : 'ml-24';
-          const isLocked = lesson.isLocked;
+      {/* Путь с уроками */}
+      <div className="relative w-full max-w-sm px-4">
 
-          return (
-            <div key={lesson.id} className={`relative flex items-center justify-center ${offsetClass}`}>
-              <button
-                disabled={isLocked}
-                onClick={() => navigate(`/child/${childId}/lesson/${lesson.id}`)}
-                className={`
-                  w-32 h-32 rounded-full flex flex-col items-center justify-center border-b-8 transition-transform active:scale-90
-                  ${isLocked 
-                    ? 'bg-gray-300 border-gray-400 text-gray-500 cursor-not-allowed' 
-                    : 'bg-primary border-red-700 text-white hover:bg-red-400 cursor-pointer hover:-translate-y-2'}
-                `}
+        {/* Вертикальная линия пути */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-3 -translate-x-1/2 rounded-full bg-white/50 -z-10" />
+
+        <div className="flex flex-col items-center gap-6">
+          {lessons.map((lesson, index) => {
+            const offsetClass = index % 2 === 0 ? '-translate-x-16' : 'translate-x-16';
+
+            let btnStyle = '';
+            let icon = null;
+            let labelColor = '';
+
+            if (lesson.isCompleted) {
+              btnStyle = 'bg-[#58cc02] border-[#46a302] text-white hover:-translate-y-2 cursor-pointer';
+              icon = <Star size={40} className="fill-white mb-1" />;
+              labelColor = 'text-white';
+            } else if (!lesson.isLocked) {
+              btnStyle = 'bg-[#1cb0f6] border-[#1499d3] text-white hover:-translate-y-2 cursor-pointer animate-pulse';
+              icon = <PlayCircle size={44} className="mb-1" />;
+              labelColor = 'text-white';
+            } else {
+              btnStyle = 'bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed opacity-70';
+              icon = <Lock size={36} className="mb-1 opacity-60" />;
+              labelColor = 'text-gray-400';
+            }
+
+            return (
+              <motion.div
+                key={lesson.id}
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.08, type: 'spring', bounce: 0.4 }}
+                className={`${offsetClass} transition-transform`}
               >
-                {isLocked ? (
-                  <Star size={40} className="mb-2 opacity-50" />
-                ) : (
-                  <PlayCircle size={48} className="mb-2 fill-white text-primary" />
+                <button
+                  disabled={lesson.isLocked}
+                  onClick={() =>
+                    !lesson.isLocked &&
+                    navigate(`/child/${childId}/lesson/${lesson.id}`)
+                  }
+                  className={`
+                    w-28 h-28 rounded-full flex flex-col items-center justify-center
+                    border-b-[6px] transition-all active:border-b-0 active:translate-y-[6px]
+                    shadow-lg ${btnStyle}
+                  `}
+                >
+                  {icon}
+                  <span className={`font-black text-xs text-center leading-tight px-2 ${labelColor}`}>
+                    {lesson.title}
+                  </span>
+                </button>
+
+                {/* XP награда под кнопкой */}
+                {!lesson.isLocked && (
+                  <p className="text-center text-xs font-black text-[#5a8a9f] mt-2">
+                    +{lesson.xp_reward} XP
+                  </p>
                 )}
-                <span className="font-black text-lg text-center leading-tight">
-                  {lesson.title}
-                </span>
-              </button>
-            </div>
-          );
-        })}
+              </motion.div>
+            );
+          })}
+
+          {/* Финишная звезда */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: lessons.length * 0.08 + 0.2 }}
+            className="text-6xl mt-4"
+          >
+            🏆
+          </motion.div>
+        </div>
       </div>
     </div>
   );
