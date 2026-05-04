@@ -26,15 +26,12 @@ export default function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* ── Публичные ── */}
         <Route path="/"     element={<LandingPage />} />
         <Route path="/auth" element={<PublicRoute><AuthPage /></PublicRoute>} />
 
-        {/* ── Родительские ── */}
         <Route path="/select"    element={<PrivateRoute><ChildSelector /></PrivateRoute>} />
         <Route path="/dashboard" element={<PrivateRoute><ParentDashboard /></PrivateRoute>} />
 
-        {/* ── Детские ── */}
         <Route path="/child/:childId/map"
           element={<PrivateRoute><ChildMap /></PrivateRoute>} />
         <Route path="/child/:childId/lesson/:lessonId"
@@ -44,10 +41,8 @@ export default function App() {
         <Route path="/child/:childId/leaderboard"
           element={<PrivateRoute><LeaderboardScreen /></PrivateRoute>} />
 
-        {/* ── Админ ── */}
         <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
 
-        {/* ── Fallback ── */}
         <Route path="*" element={<Navigate to="/" replace />} />
 
       </Routes>

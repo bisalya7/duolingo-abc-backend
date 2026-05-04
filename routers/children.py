@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import Child, User, ChildBadge, Progress
 from schemas import ChildCreate, ChildResponse
-# ✅ Единственный источник get_current_user
 from routers.auth import get_current_user
 
 router = APIRouter(prefix="/children", tags=["Children"])
@@ -97,7 +96,6 @@ def get_child_progress(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # ✅ Проверяем владельца
     child = db.query(Child).filter(
         Child.id == child_id,
         Child.parent_id == current_user.id
@@ -130,7 +128,6 @@ def get_child_badges(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # ✅ Проверяем владельца
     child = db.query(Child).filter(
         Child.id == child_id,
         Child.parent_id == current_user.id

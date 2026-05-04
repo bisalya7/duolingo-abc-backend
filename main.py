@@ -16,13 +16,12 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # В проде заменить на конкретный домен фронтенда
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Все роутеры подключены
 app.include_router(auth.router)
 app.include_router(children.router)
 app.include_router(learning.router)
@@ -31,7 +30,6 @@ app.include_router(parents.router)
 app.include_router(notifications.router)
 
 
-# Этот эндпоинт оставляем для совместимости с фронтендом
 @app.post("/children/{child_id}/progress", response_model=schemas.ChildResponse)
 def update_child_progress(
     child_id: int,

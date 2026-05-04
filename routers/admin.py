@@ -2,14 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
-# ✅ Все импорты моделей в одном месте
 from models import Unit, Lesson, Exercise, User, Progress
 import schemas
 
 router = APIRouter(prefix="/api/v1", tags=["Admin & Curriculum"])
 
-
-# ─── UNITS CRUD ───────────────────────────────────────────────────────────────
 
 @router.get("/units", response_model=List[schemas.UnitResponse])
 def get_units(db: Session = Depends(get_db)):
@@ -55,7 +52,6 @@ def delete_unit(id: int, db: Session = Depends(get_db)):
     return {"message": f"Раздел {id} удален"}
 
 
-# ─── LESSONS CRUD ─────────────────────────────────────────────────────────────
 
 @router.get("/lessons", response_model=List[schemas.LessonResponse])
 def get_lessons(unit_id: int = None, db: Session = Depends(get_db)):
@@ -84,7 +80,6 @@ def delete_lesson(lesson_id: int, db: Session = Depends(get_db)):
     return {"message": "Урок удален"}
 
 
-# ─── EXERCISES CRUD ───────────────────────────────────────────────────────────
 
 @router.get("/lessons/{lesson_id}/exercises", response_model=List[schemas.ExerciseResponse])
 def get_exercises_by_lesson(lesson_id: int, db: Session = Depends(get_db)):
@@ -110,7 +105,6 @@ def delete_exercise(ex_id: int, db: Session = Depends(get_db)):
     return {"message": "Задание удалено"}
 
 
-# ─── ADMIN STATS ──────────────────────────────────────────────────────────────
 
 @router.get("/admin/stats")
 def get_admin_stats(db: Session = Depends(get_db)):
@@ -124,7 +118,6 @@ def get_admin_stats(db: Session = Depends(get_db)):
     }
 
 
-# ─── ADMIN USERS ──────────────────────────────────────────────────────────────
 
 @router.get("/admin/users")
 def get_users(
@@ -147,9 +140,7 @@ def get_users(
     }
 
 
-# ─── ADMIN LOGS ───────────────────────────────────────────────────────────────
 
 @router.get("/admin/logs")
 def get_logs(page: int = 1, limit: int = 20):
-    # Заглушка — в продакшене заменить на реальную таблицу логов
     return {"logs": [], "total": 0}

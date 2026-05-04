@@ -44,7 +44,6 @@ export default function LeaderboardScreen() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fff4e0] to-[#ffe8a0] flex flex-col items-center pb-16">
 
-      {/* Шапка */}
       <div className="w-full max-w-lg px-4 pt-6 pb-4 sticky top-0 z-10 bg-gradient-to-b from-[#fff4e0] to-transparent">
         <div className="bg-white/90 backdrop-blur rounded-[2rem] p-4 shadow-lg border-2 border-white flex items-center gap-4">
           <button
@@ -61,7 +60,6 @@ export default function LeaderboardScreen() {
         </div>
       </div>
 
-      {/* Фильтр возраста */}
       <div className="flex gap-2 mt-4 mb-8 bg-white/70 rounded-2xl p-1.5 shadow-sm">
         {AGE_GROUPS.map((g) => (
           <button
@@ -77,10 +75,8 @@ export default function LeaderboardScreen() {
         ))}
       </div>
 
-      {/* Топ-3 пьедестал */}
       {!loading && !error && leaders.length >= 3 && (
         <div className="flex items-end justify-center gap-3 mb-8 w-full max-w-lg px-4">
-          {/* 2 место */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -98,7 +94,6 @@ export default function LeaderboardScreen() {
             <div className="bg-gray-200 w-full h-12 rounded-b-xl -mt-1" />
           </motion.div>
 
-          {/* 1 место */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -122,7 +117,6 @@ export default function LeaderboardScreen() {
             <div className="bg-yellow-200 w-full h-16 rounded-b-xl -mt-1" />
           </motion.div>
 
-          {/* 3 место */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -142,7 +136,6 @@ export default function LeaderboardScreen() {
         </div>
       )}
 
-      {/* Список остальных */}
       <div className="w-full max-w-lg px-4">
         {loading && (
           <div className="flex justify-center py-12">

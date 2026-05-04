@@ -5,7 +5,6 @@ import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { LogOut, PlusCircle } from 'lucide-react';
 
-// Цвета карточек — чередуются для разнообразия
 const CARD_COLORS = [
   { bg: 'bg-[#FFF4E0]', border: 'border-[#FFD200]', shadow: 'shadow-[0_6px_0_0_#e6bd00]', text: 'text-[#b38600]' },
   { bg: 'bg-[#E8F5FF]', border: 'border-[#1cb0f6]', shadow: 'shadow-[0_6px_0_0_#1499d3]', text: 'text-[#1499d3]' },
@@ -32,7 +31,6 @@ export default function ChildSelector() {
     try {
       const data = await api.getChildren();
       setChildren(data);
-      // Если детей нет — сразу показываем форму добавления
       if (data.length === 0) setShowAddForm(true);
     } catch (e) {
       console.error(e);
@@ -77,7 +75,6 @@ export default function ChildSelector() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#ddf4ff] to-[#b8e8ff] flex flex-col items-center justify-center p-6">
 
-      {/* Шапка */}
       <div className="w-full max-w-2xl flex justify-between items-center mb-10">
         <div className="text-center">
           <h1 className="text-4xl font-black text-[#1cb0f6] drop-shadow-sm">
@@ -93,7 +90,6 @@ export default function ChildSelector() {
         </button>
       </div>
 
-      {/* Сетка карточек детей */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-2xl mb-8">
         {children.map((child, index) => {
           const colors = CARD_COLORS[index % CARD_COLORS.length];
@@ -112,22 +108,18 @@ export default function ChildSelector() {
                 cursor-pointer transition-all active:shadow-none active:translate-y-[6px]
               `}
             >
-              {/* Аватар */}
               <div className="text-7xl mb-3 drop-shadow-md">
                 {child.avatar || AVATARS[index % AVATARS.length]}
               </div>
 
-              {/* Имя */}
               <span className="text-xl font-black text-[#3c3c3c] mb-1">
                 {child.name}
               </span>
 
-              {/* Возраст */}
               <span className={`text-xs font-black uppercase tracking-widest ${colors.text}`}>
                 {child.age} лет
               </span>
 
-              {/* XP бар */}
               <div className="w-full mt-4">
                 <div className="flex justify-between text-xs font-bold text-gray-400 mb-1">
                   <span>Уровень {child.level}</span>
@@ -143,7 +135,6 @@ export default function ChildSelector() {
                 </div>
               </div>
 
-              {/* Стрик */}
               {child.daily_streak > 0 && (
                 <div className="mt-3 flex items-center gap-1 bg-white/70 rounded-full px-3 py-1">
                   <span className="text-base">🔥</span>
@@ -156,7 +147,6 @@ export default function ChildSelector() {
           );
         })}
 
-        {/* Кнопка добавить ребёнка */}
         {!showAddForm && (
           <motion.button
             initial={{ opacity: 0, y: 30 }}
@@ -175,7 +165,6 @@ export default function ChildSelector() {
         )}
       </div>
 
-      {/* Форма добавления ребёнка */}
       {showAddForm && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -187,7 +176,6 @@ export default function ChildSelector() {
           </h2>
 
           <form onSubmit={handleAddChild} className="space-y-5">
-            {/* Выбор аватара */}
             <div>
               <label className="block text-sm font-black text-gray-500 uppercase tracking-widest mb-3">
                 Выбери аватар
@@ -211,7 +199,6 @@ export default function ChildSelector() {
               </div>
             </div>
 
-            {/* Имя */}
             <div>
               <label className="block text-sm font-black text-gray-500 uppercase tracking-widest mb-2">
                 Имя
@@ -226,7 +213,6 @@ export default function ChildSelector() {
               />
             </div>
 
-            {/* Возраст */}
             <div>
               <label className="block text-sm font-black text-gray-500 uppercase tracking-widest mb-2">
                 Возраст (3–8 лет)

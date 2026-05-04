@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import Notification, User
 from schemas import NotificationResponse
-# ✅ Единый источник get_current_user — только из routers.auth
 from routers.auth import get_current_user
 from socket_manager import manager
 

@@ -3,7 +3,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star } from 'lucide-react';
 
-// Конфетти — чистый CSS/JS, без доп. библиотек
 function Confetti() {
   const pieces = Array.from({ length: 48 }, (_, i) => ({
     id: i,
@@ -36,7 +35,6 @@ function Confetti() {
   );
 }
 
-// Сообщение в зависимости от кол-ва звёзд
 function getMessage(stars) {
   if (stars === 3) return { emoji: '🏆', text: 'Идеально!', sub: 'Ты настоящий чемпион!' };
   if (stars === 2) return { emoji: '🎉', text: 'Молодец!', sub: 'Почти идеально, так держать!' };
@@ -47,8 +45,6 @@ export default function ResultsScreen() {
   const { childId, lessonId } = useParams();
   const navigate = useNavigate();
 
-  // Данные могут прийти через location.state (из LessonScreen)
-  // или через URL-параметры как запасной вариант
   const location = useLocation();
   const {
     stars = 2,
@@ -75,7 +71,6 @@ export default function ResultsScreen() {
 
       {stars >= 2 && <Confetti />}
 
-      {/* Бейдж-попап */}
       <AnimatePresence>
         {showBadge && newBadges.length > 0 && (
           <motion.div
@@ -107,7 +102,6 @@ export default function ResultsScreen() {
 
       <div className="relative z-10 flex flex-col items-center w-full max-w-sm">
 
-        {/* Эмодзи + заголовок */}
         <motion.div
           initial={{ scale: 0, rotate: -20 }}
           animate={{ scale: 1, rotate: 0 }}
@@ -135,7 +129,6 @@ export default function ResultsScreen() {
           {msg.sub}
         </motion.p>
 
-        {/* Звёзды */}
         <div className="flex gap-3 mb-6">
           {[1, 2, 3].map((s) => (
             <motion.div
@@ -156,7 +149,6 @@ export default function ResultsScreen() {
           ))}
         </div>
 
-        {/* Статы */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -179,7 +171,6 @@ export default function ResultsScreen() {
           </div>
         </motion.div>
 
-        {/* Кнопки */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -194,7 +185,6 @@ export default function ResultsScreen() {
             Продолжить →
           </motion.button>
 
-          {/* Повторить урок если мало звёзд */}
           {stars < 3 && (
             <motion.button
               whileTap={{ scale: 0.96 }}

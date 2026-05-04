@@ -8,7 +8,6 @@ import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 
-// ─── Вспомогательные компоненты ──────────────────────────────────────────────
 
 function StatCard({ icon, label, value, color }) {
   return (
@@ -24,7 +23,6 @@ function StatCard({ icon, label, value, color }) {
   );
 }
 
-// Модальное окно
 function Modal({ title, onClose, children }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
@@ -46,7 +44,7 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-// Инпут
+// 
 function Field({ label, ...props }) {
   return (
     <div>
@@ -59,7 +57,6 @@ function Field({ label, ...props }) {
   );
 }
 
-// Кнопка действия
 function Btn({ children, variant = 'primary', size = 'md', ...props }) {
   const base = 'font-black rounded-2xl transition-all active:scale-95 flex items-center gap-2';
   const sizes = { sm: 'px-3 py-2 text-sm', md: 'px-5 py-3 text-sm', lg: 'px-8 py-4 text-base' };
@@ -76,7 +73,6 @@ function Btn({ children, variant = 'primary', size = 'md', ...props }) {
   );
 }
 
-// ─── Вкладка: Дашборд ─────────────────────────────────────────────────────────
 function DashboardTab() {
   const [stats, setStats] = useState(null);
 
@@ -104,7 +100,6 @@ function DashboardTab() {
   );
 }
 
-// ─── Вкладка: Учебный план (Units → Lessons → Exercises) ─────────────────────
 function CurriculumTab() {
   const [units, setUnits] = useState([]);
   const [expandedUnits, setExpandedUnits] = useState({});
@@ -113,10 +108,9 @@ function CurriculumTab() {
   const [exercisesByLesson, setExercisesByLesson] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Модальные окна
   const [modal, setModal] = useState(null); // { type, data? }
 
-  // Формы
+  
   const [unitForm, setUnitForm] = useState({ title: '', order: '' });
   const [lessonForm, setLessonForm] = useState({ title: '', order: '', xp_reward: '10', unit_id: '' });
   const [exForm, setExForm] = useState({ type: 'match', question: '', options: '', correct_answer: '', lesson_id: '' });
@@ -164,7 +158,6 @@ function CurriculumTab() {
     if (next) loadExercises(id);
   };
 
-  // ── CRUD Units ──
   const createUnit = async () => {
     try {
       await api.createUnit({ title: unitForm.title, order: parseInt(unitForm.order) || units.length + 1 });
@@ -182,7 +175,6 @@ function CurriculumTab() {
     } catch (e) { alert('Ошибка удаления'); }
   };
 
-  // ── CRUD Lessons ──
   const createLesson = async () => {
     try {
       await api.createLesson({
@@ -206,7 +198,6 @@ function CurriculumTab() {
     } catch { alert('Ошибка удаления'); }
   };
 
-  // ── CRUD Exercises ──
   const createExercise = async () => {
     try {
       const content = {
@@ -268,7 +259,6 @@ function CurriculumTab() {
         {units.map((unit) => (
           <div key={unit.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
 
-            {/* Заголовок раздела */}
             <div className="flex items-center gap-3 px-6 py-4">
               <button
                 onClick={() => toggleUnit(unit.id)}
@@ -303,7 +293,6 @@ function CurriculumTab() {
               </div>
             </div>
 
-            {/* Уроки */}
             <AnimatePresence>
               {expandedUnits[unit.id] && (
                 <motion.div
@@ -322,7 +311,6 @@ function CurriculumTab() {
                       (lessonsByUnit[unit.id] ?? []).map((lesson) => (
                         <div key={lesson.id} className="bg-gray-50 rounded-2xl overflow-hidden">
 
-                          {/* Строка урока */}
                           <div className="flex items-center gap-3 px-4 py-3">
                             <button
                               onClick={() => toggleLesson(lesson.id)}
@@ -357,7 +345,6 @@ function CurriculumTab() {
                             </div>
                           </div>
 
-                          {/* Задания */}
                           <AnimatePresence>
                             {expandedLessons[lesson.id] && (
                               <motion.div
@@ -416,7 +403,6 @@ function CurriculumTab() {
         ))}
       </div>
 
-      {/* ── Модалки ── */}
       <AnimatePresence>
         {modal === 'unit' && (
           <Modal title="Новый раздел" onClose={() => setModal(null)}>
@@ -459,7 +445,6 @@ function CurriculumTab() {
         {modal === 'exercise' && (
           <Modal title="Новое задание" onClose={() => setModal(null)}>
             <div className="space-y-4">
-              {/* Тип упражнения */}
               <div>
                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Тип задания</label>
                 <div className="grid grid-cols-3 gap-2">
@@ -513,7 +498,6 @@ function CurriculumTab() {
   );
 }
 
-// ─── Главный компонент AdminPanel ─────────────────────────────────────────────
 const TABS = [
   { id: 'dashboard', label: 'Дашборд', icon: <LayoutDashboard size={18} /> },
   { id: 'curriculum', label: 'Учебный план', icon: <BookOpen size={18} /> },
@@ -527,7 +511,6 @@ export default function AdminPanel() {
   return (
     <div className="min-h-screen bg-[#F7F9FC] flex">
 
-      {/* ── Боковая навигация ── */}
       <aside className="w-60 min-h-screen bg-white border-r border-gray-100 flex flex-col py-6 flex-shrink-0">
         <div className="px-6 mb-8">
           <span className="text-2xl font-black text-[#1cb0f6] tracking-tighter">DUO_KIDS</span>
@@ -561,7 +544,6 @@ export default function AdminPanel() {
         </div>
       </aside>
 
-      {/* ── Основной контент ── */}
       <main className="flex-1 p-8 overflow-auto">
         <AnimatePresence mode="wait">
           <motion.div

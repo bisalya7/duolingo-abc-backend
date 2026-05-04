@@ -20,7 +20,6 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white font-sans overflow-x-hidden">
 
-      {/* ── Навигация ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -44,11 +43,9 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ── Hero ── */}
       <section className="pt-28 pb-20 bg-gradient-to-b from-[#ddf4ff] to-white px-6">
         <div className="max-w-4xl mx-auto text-center">
 
-          {/* Анимированные эмодзи */}
           <div className="flex justify-center gap-6 mb-8">
             {['🐱', '🦉', '🐶'].map((emoji, i) => (
               <motion.div
@@ -102,7 +99,6 @@ export default function LandingPage() {
             </button>
           </motion.div>
 
-          {/* Соц. доказательство */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -114,7 +110,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Возможности ── */}
       <section className="py-20 bg-white px-6">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-black text-[#3c3c3c] text-center mb-4">
@@ -143,7 +138,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Геймификация ── */}
       <section className="py-20 bg-gradient-to-b from-[#fff4e0] to-white px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-black text-[#3c3c3c] mb-4">
@@ -176,7 +170,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Как это работает ── */}
       <section id="how" className="py-20 bg-white px-6">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-4xl font-black text-[#3c3c3c] text-center mb-12">
@@ -202,7 +195,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Для родителей ── */}
       <section className="py-20 bg-[#F7F9FC] px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-black text-[#3c3c3c] mb-4">
@@ -234,7 +226,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CTA ── */}
       <section className="py-24 bg-gradient-to-b from-[#ddf4ff] to-[#b8e8ff] px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -257,7 +248,6 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* ── Футер ── */}
       <footer className="bg-white border-t border-gray-100 py-8 px-6 text-center">
         <div className="flex items-center justify-center gap-2 mb-3">
           <span className="text-2xl">🦉</span>

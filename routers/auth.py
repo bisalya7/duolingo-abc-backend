@@ -73,7 +73,6 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
             detail="Этот email уже зарегистрирован"
         )
 
-    # ✅ Хэшируем пароль перед сохранением
     new_user = User(
         email=user.email,
         password_hash=hash_password(user.password)
@@ -91,7 +90,6 @@ def login_user(
 ):
     user = db.query(User).filter(User.email == form_data.username).first()
 
-    # ✅ Проверяем через bcrypt, а не сравниваем открытые строки
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

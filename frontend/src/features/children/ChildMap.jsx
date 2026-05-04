@@ -23,7 +23,6 @@ export default function ChildMap() {
       setLoading(true);
       setError(null);
 
-      // Параллельно загружаем данные ребёнка, уроки и прогресс
       const [childData, lessonsData, progressData] = await Promise.all([
         api.getChild(childId),
         api.getLessons(),
@@ -32,16 +31,13 @@ export default function ChildMap() {
 
       setChild(childData);
 
-      // Собираем Set из ID пройденных уроков
       const done = new Set(
         (progressData.history || []).map((p) => p.lesson_id)
       );
       setCompletedIds(done);
 
-      // Помечаем уроки: completed / available / locked
       const lessonsList = (lessonsData.items || lessonsData || []).map((lesson, index) => {
         const isCompleted = done.has(lesson.id);
-        // Разблокирован если: первый, или предыдущий пройден
         const prevLesson = index > 0 ? lessonsData.items?.[index - 1] || lessonsData[index - 1] : null;
         const isLocked = index > 0 && !done.has(prevLesson?.id);
 
@@ -56,7 +52,6 @@ export default function ChildMap() {
     }
   };
 
-  // --- Loading ---
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#ddf4ff] to-[#b8e8ff] flex flex-col items-center justify-center gap-4">
@@ -72,7 +67,6 @@ export default function ChildMap() {
     );
   }
 
-  // --- Error ---
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#ddf4ff] to-[#b8e8ff] flex flex-col items-center justify-center gap-6 p-6 text-center">
@@ -88,7 +82,6 @@ export default function ChildMap() {
     );
   }
 
-  // --- Empty ---
   if (lessons.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#ddf4ff] to-[#b8e8ff] flex flex-col items-center justify-center gap-6 p-6 text-center">
@@ -108,7 +101,6 @@ export default function ChildMap() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#ddf4ff] to-[#b8e8ff] flex flex-col items-center pb-16">
 
-      {/* Шапка */}
       <div className="w-full max-w-lg px-4 pt-6 pb-4 sticky top-0 z-10 bg-gradient-to-b from-[#ddf4ff] to-transparent">
         <div className="bg-white/90 backdrop-blur rounded-[2rem] p-4 shadow-lg border-2 border-white flex items-center justify-between">
 
@@ -134,7 +126,6 @@ export default function ChildMap() {
             <div className="bg-[#fff4e0] border-2 border-[#ffd200] text-[#b38600] px-3 py-2 rounded-2xl font-black text-sm flex items-center gap-1">
               ⭐ {child?.total_xp || 0}
             </div>
-            {/* Стрик */}
             {child?.daily_streak > 0 && (
               <div className="bg-orange-50 border-2 border-orange-300 text-orange-500 px-3 py-2 rounded-2xl font-black text-sm flex items-center gap-1">
                 <Flame size={16} /> {child.daily_streak}
@@ -144,7 +135,6 @@ export default function ChildMap() {
         </div>
       </div>
 
-      {/* Заголовок карты */}
       <div className="text-center my-6">
         <h1 className="text-3xl font-black text-[#1cb0f6] drop-shadow-sm">Карта уроков</h1>
         <p className="text-[#5a8a9f] font-bold mt-1">
@@ -152,10 +142,8 @@ export default function ChildMap() {
         </p>
       </div>
 
-      {/* Путь с уроками */}
       <div className="relative w-full max-w-sm px-4">
 
-        {/* Вертикальная линия пути */}
         <div className="absolute left-1/2 top-0 bottom-0 w-3 -translate-x-1/2 rounded-full bg-white/50 -z-10" />
 
         <div className="flex flex-col items-center gap-6">
@@ -206,7 +194,6 @@ export default function ChildMap() {
                   </span>
                 </button>
 
-                {/* XP награда под кнопкой */}
                 {!lesson.isLocked && (
                   <p className="text-center text-xs font-black text-[#5a8a9f] mt-2">
                     +{lesson.xp_reward} XP
@@ -216,7 +203,6 @@ export default function ChildMap() {
             );
           })}
 
-          {/* Финишная звезда */}
           <motion.div
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}

@@ -10,7 +10,6 @@ from socket_manager import manager
 router = APIRouter(prefix="/api/v1/learning", tags=["Learning"])
 
 
-# ✅ Единственный рабочий эндпоинт завершения урока
 @router.post("/lessons/{lesson_id}/complete")
 async def finish_lesson(
     lesson_id: int,
@@ -18,7 +17,6 @@ async def finish_lesson(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # ✅ child_id берём из тела запроса, а не захардкоженный
     child = db.query(Child).filter(
         Child.id == data.child_id,
         Child.parent_id == current_user.id
@@ -37,7 +35,6 @@ async def finish_lesson(
     child = result["child"]
     new_badges = result["new_badges"]
 
-    # Реалтайм уведомление через WebSocket
     if new_badges:
         ws_message = (
             f"Ура! Ваш ребенок {child.name} получил "
@@ -137,7 +134,6 @@ def submit_exercise(exercise_id: int, answer_data: dict, db: Session = Depends(g
     return {"correct": True, "time_spent": "12s"}
 
 
-# ✅ Единственный рабочий эндпоинт лидерборда с реальными данными из БД
 @router.get("/leaderboard", response_model=list[LeaderboardEntry])
 def get_leaderboard(age_group: str = "all", db: Session = Depends(get_db)):
     """Таблица лидеров по XP с фильтром по возрастной группе"""

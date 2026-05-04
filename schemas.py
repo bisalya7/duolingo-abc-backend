@@ -49,8 +49,6 @@ class LessonResponse(BaseModel):
     class Config:
         from_attributes = True
 
-
-# ✅ Добавили child_id — больше не захардкожен как 1
 class ProgressCreate(BaseModel):
     child_id: int
     lesson_id: int
@@ -87,7 +85,6 @@ class BadgeResponse(BaseModel):
 
 class ProgressUpdate(BaseModel):
     xp_added: int
-    # === СХЕМЫ ДЛЯ АДМИНКИ (Units & Lessons CRUD) ===
 
 class UnitCreate(BaseModel):
     title: str
@@ -112,7 +109,7 @@ class LessonCreate(BaseModel):
     unit_id: int
     title: str
     order: int
-    xp_reward: int = 10  # По умолчанию даем 10 XP за урок
+    xp_reward: int = 10 
 
 class LessonUpdate(BaseModel):
     title: Optional[str] = None
@@ -123,8 +120,8 @@ class LessonUpdate(BaseModel):
 
 class ExerciseCreate(BaseModel):
     lesson_id: int
-    type: str  # 'match', 'listen', 'drag' и т.д.
-    content: Any  # JSON с вопросом и вариантами
+    type: str 
+    content: Any 
     answer: str
 
 class ExerciseUpdate(BaseModel):

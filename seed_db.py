@@ -6,14 +6,12 @@ def seed_database():
     db = SessionLocal()
     
     try:
-        # Проверяем, есть ли уже данные
         if db.query(Badge).first():
             print("База данных уже содержит данные. Пропускаем наполнение.")
             return
 
         print("Начинаем наполнение базы данных...")
 
-        # 1. Создаем бейджи
         badges = [
             Badge(name="Первооткрыватель", description="Получи 1 уровень!", icon_url="🌟"),
             Badge(name="Умник", description="Достигни 5 уровня", icon_url="🧠"),
@@ -24,14 +22,12 @@ def seed_database():
         db.commit()
         print("✅ Бейджи добавлены")
 
-        # 2. Создаем Юниты
         unit1 = Unit(title="Алфавит: А, О, У", order=1)
         unit2 = Unit(title="Первые слоги", order=2)
         db.add_all([unit1, unit2])
         db.commit()
         print("✅ Юниты добавлены")
 
-        # 3. Создаем Уроки
         lesson1 = Lesson(unit_id=unit1.id, title="Буква А", order=1)
         lesson2 = Lesson(unit_id=unit1.id, title="Буква О", order=2)
         lesson3 = Lesson(unit_id=unit2.id, title="Слоги МА и ПА", order=1)
@@ -39,9 +35,7 @@ def seed_database():
         db.commit()
         print("✅ Уроки добавлены")
 
-        # 4. Создаем Упражнения (УБРАЛИ ПОЛЕ answer)
         exercises = [
-            # === УРОК 1 ===
             Exercise(lesson_id=lesson1.id, type="match", content=json.dumps({
                 "question": "Найди букву А", 
                 "options": ["Б", "А", "В"],
@@ -122,9 +116,7 @@ def seed_database():
         db.close()
 
 if __name__ == "__main__":
-    # Сначала удаляем старые таблицы, чтобы сбросить неудачную попытку
     Base.metadata.drop_all(bind=engine)
-    # Создаем таблицы заново
     Base.metadata.create_all(bind=engine)
     
     seed_database()

@@ -1,8 +1,6 @@
-# docker-compose.yml
 version: '3.8'
 
 services:
-  # 1. База данных PostgreSQL
   db:
     image: postgres:15-alpine
     environment:
@@ -14,41 +12,34 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  # 2. Кэш Redis (по ТЗ нужен cache для +3 баллов)
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
 
-  # 3. Твой FastAPI Бэкенд
   backend:
-    build: ./backend  # Указываем путь к папке бэкенда
+    build: ./backend 
     ports:
       - "8000:8000"
     environment:
-      # Бэкенд будет стучаться в БД внутри Докера
       - DATABASE_URL=postgresql://admin:adminpassword@db:5432/duolingo_abc_db
       - REDIS_URL=redis://redis:6379
     depends_on:
       - db
       - redis
-    # Используем reload для удобной разработки
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./backend:/app
 
-  # 4. Твой React/Vue Фронтенд
   frontend:
     build: 
-      context: ./frontend # Указываем путь к папке фронтенда
-      # Если используешь Vite/React, нужен будет Dockerfile и во фронтенде, 
-      # либо можно запустить просто через node образ:
+      context: ./frontend 
     image: node:20-alpine
     working_dir: /app
     volumes:
       - ./frontend:/app
     ports:
-      - "5173:5173" # Стандартный порт Vite
+      - "5173:5173"
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
 
 volumes:

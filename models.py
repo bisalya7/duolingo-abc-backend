@@ -20,7 +20,6 @@ class Child(Base):
     level = Column(Integer, default=1)
     total_xp = Column(Integer, default=0)
     
-    # Новые поля для геймификации по ТЗ (Streak)
     daily_streak = Column(Integer, default=0)
     last_active_date = Column(Date, nullable=True)
 
@@ -64,11 +63,6 @@ class Progress(Base):
     completed_at = Column(DateTime(timezone=True), server_default=func.now())
     child = relationship("Child", back_populates="progress")
     lesson = relationship("Lesson", back_populates="progress")
-
-# ==========================================
-# НОВЫЕ ТАБЛИЦЫ ПО ТЗ (Уведомления и Награды)
-# ==========================================
-
 class Notification(Base):
     __tablename__ = "notifications"
     id = Column(Integer, primary_key=True, index=True)

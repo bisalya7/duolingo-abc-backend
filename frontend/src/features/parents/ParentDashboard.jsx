@@ -19,7 +19,7 @@ export default function ParentDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', age: '' });
   const [showNotifications, setShowNotifications] = useState(false);
-  const [wsMessage, setWsMessage] = useState(null); // реалтайм уведомление
+  const [wsMessage, setWsMessage] = useState(null); 
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
   const wsRef = useRef(null);
@@ -31,7 +31,6 @@ export default function ParentDashboard() {
   }, []);
 
   const connectWebSocket = () => {
-    // Берём user_id из токена (парсим JWT)
     const token = localStorage.getItem('token');
     if (!token) return;
     try {
@@ -42,13 +41,11 @@ export default function ParentDashboard() {
 
       wsRef.current.onmessage = (event) => {
         setWsMessage(event.data);
-        // Автоматически скрываем через 5 секунд
         setTimeout(() => setWsMessage(null), 5000);
         // Обновляем список уведомлений
         fetchNotifications();
       };
     } catch (e) {
-      // WebSocket не критичен — молча игнорируем ошибку подключения
     }
   };
 
@@ -72,7 +69,6 @@ export default function ParentDashboard() {
       const data = await api.getNotifications();
       setNotifications(data);
     } catch (e) {
-      // Не критично
     }
   };
 
@@ -114,15 +110,13 @@ export default function ParentDashboard() {
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  // Готовим данные для графика XP по урокам
   const buildXpChartData = (history = []) => {
-    // Группируем по дням недели
     const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     const map = Object.fromEntries(days.map((d) => [d, 0]));
     history.forEach((item) => {
       const date = new Date(item.completed_at);
       const day = days[date.getDay() === 0 ? 6 : date.getDay() - 1];
-      map[day] += 10; // каждый урок даёт ~10 XP
+      map[day] += 10;
     });
     return days.map((day) => ({ day, xp: map[day] }));
   };
@@ -145,7 +139,6 @@ export default function ParentDashboard() {
   return (
     <div className="min-h-screen bg-[#F7F9FC]">
 
-      {/* Реалтайм уведомление (WebSocket) */}
       {wsMessage && (
         <div className="fixed top-4 right-4 z-50 bg-white border-l-4 border-[#58cc02] rounded-2xl p-4 shadow-xl max-w-sm animate-bounce">
           <div className="flex items-start gap-3">
@@ -160,7 +153,6 @@ export default function ParentDashboard() {
         </div>
       )}
 
-      {/* Шапка */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -172,7 +164,6 @@ export default function ParentDashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Кнопка уведомлений */}
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative p-3 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors"
@@ -197,7 +188,6 @@ export default function ParentDashboard() {
 
       <main className="max-w-5xl mx-auto px-6 py-8">
 
-        {/* Панель уведомлений */}
         {showNotifications && (
           <div className="bg-white rounded-3xl shadow-lg border border-gray-100 mb-8 overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
@@ -245,7 +235,6 @@ export default function ParentDashboard() {
           </div>
         )}
 
-        {/* Карточки детей */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
           {children.map((child) => (
             <div
@@ -276,7 +265,6 @@ export default function ParentDashboard() {
                 </div>
               </div>
 
-              {/* XP прогресс-бар */}
               <div className="mb-5">
                 <div className="flex justify-between text-xs font-bold text-gray-300 mb-1 uppercase tracking-widest">
                   <span>Прогресс</span>
@@ -307,7 +295,6 @@ export default function ParentDashboard() {
             </div>
           ))}
 
-          {/* Добавить ребёнка */}
           {!showAddForm && (
             <button
               onClick={() => setShowAddForm(true)}
@@ -319,7 +306,6 @@ export default function ParentDashboard() {
           )}
         </div>
 
-        {/* Форма добавления */}
         {showAddForm && (
           <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 mb-8">
             <h2 className="text-xl font-black text-[#3c3c3c] mb-6">Новый профиль</h2>
@@ -346,7 +332,6 @@ export default function ParentDashboard() {
           </div>
         )}
 
-        {/* Детальный просмотр ребёнка */}
         {selectedChild && (
           <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 mb-8">
             <div className="flex items-center justify-between mb-6">
@@ -364,7 +349,6 @@ export default function ParentDashboard() {
 
             {childProgress ? (
               <>
-                {/* Статы */}
                 <div className="grid grid-cols-3 gap-4 mb-8">
                   {[
                     { icon: <BookOpen size={20} />, label: 'Уроков', value: childProgress.total_completed_lessons, color: 'text-[#1cb0f6]', bg: 'bg-blue-50' },

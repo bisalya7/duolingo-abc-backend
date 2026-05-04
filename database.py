@@ -6,10 +6,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ✅ Берём URL из .env, не захардкожен
 SQLALCHEMY_DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:1234@localhost:5432/duolingo_db"  # fallback для локальной разработки
+    "postgresql://postgres:1234@localhost:5432/duolingo_db" 
 )
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)

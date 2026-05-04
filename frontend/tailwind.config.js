@@ -7,14 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#FF4B4B",     // Красный (как у Duolingo)
-        secondary: "#4B96FF",   // Синий
-        success: "#32C832",     // Зеленый
-        warning: "#FFD200",     // Желтый
-        background: "#F7F9FC",  // Светло-серый фон
+        primary: "#FF4B4B",    
+        secondary: "#4B96FF",   
+        success: "#32C832",    
+        warning: "#FFD200",  
+        background: "#F7F9FC",  
       },
       fontFamily: {
-        sans: ['"Nunito"', 'sans-serif'], // Округлый, добрый шрифт
+        sans: ['"Nunito"', 'sans-serif'],
       }
     },
   },

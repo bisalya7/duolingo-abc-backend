@@ -57,32 +57,26 @@ export const api = {
       score,
     }).then((r) => r.data),
 
-  // ── Лидерборд ──
   getLeaderboard: (ageGroup = 'all') =>
     axiosInstance.get(`/api/v1/learning/leaderboard?age_group=${ageGroup}`).then((r) => r.data),
 
-  // ── Уведомления ──
   getNotifications:     ()   => axiosInstance.get('/api/v1/notifications/').then((r) => r.data),
   markNotificationRead: (id) => axiosInstance.patch(`/api/v1/notifications/${id}`).then((r) => r.data),
 
-  // ── Admin: Units ──
   getUnits:    ()            => axiosInstance.get('/api/v1/units').then((r) => r.data),
   getUnit:     (id)          => axiosInstance.get(`/api/v1/units/${id}`).then((r) => r.data),
   createUnit:  (data)        => axiosInstance.post('/api/v1/units', data).then((r) => r.data),
   updateUnit:  (id, data)    => axiosInstance.put(`/api/v1/units/${id}`, data).then((r) => r.data),
   deleteUnit:  (id)          => axiosInstance.delete(`/api/v1/units/${id}`).then((r) => r.data),
 
-  // Admin: Lessons CRUD (через admin router, не learning)
   getLessonsByUnit: (unitId) =>
     axiosInstance.get(`/api/v1/lessons?unit_id=${unitId}`).then((r) => r.data),
   createLesson: (data)       => axiosInstance.post('/api/v1/lessons', data).then((r) => r.data),
   updateLesson: (id, data)   => axiosInstance.put(`/api/v1/lessons/${id}`, data).then((r) => r.data),
   deleteLesson: (id)         => axiosInstance.delete(`/api/v1/lessons/${id}`).then((r) => r.data),
 
-  // Admin: Exercises CRUD
   createExercise: (data)     => axiosInstance.post('/api/v1/exercises', data).then((r) => r.data),
   deleteExercise: (id)       => axiosInstance.delete(`/api/v1/exercises/${id}`).then((r) => r.data),
 
-  // Admin: Stats
   getAdminStats: ()          => axiosInstance.get('/api/v1/admin/stats').then((r) => r.data),
 };
