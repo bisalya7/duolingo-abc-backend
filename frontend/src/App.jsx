@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 
-import LandingPage        from './features/landing/LandingPage';
+import LandingPage       from './features/landing/LandingPage';
 import AuthPage           from './features/auth/AuthPage';
 import ChildSelector      from './features/children/ChildSelector';
 import ChildMap           from './features/children/ChildMap';
@@ -19,10 +19,8 @@ function PublicRoute({ children }) {
 }
 
 function PrivateRoute({ children, allowedRoles = [] }) {
-  const { isAuthenticated, role } = useAuthStore((s) => ({
-    isAuthenticated: s.isAuthenticated,
-    role: s.role,
-  }));
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const role = useAuthStore((s) => s.role);
 
   if (!isAuthenticated) return <Navigate to="/auth" replace />;
 
@@ -32,7 +30,7 @@ function PrivateRoute({ children, allowedRoles = [] }) {
   }
 
   return children;
-}
+} // ✅ Теперь PrivateRoute закрывается корректно здесь!
 
 export default function App() {
   return (

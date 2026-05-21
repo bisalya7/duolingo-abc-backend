@@ -10,7 +10,7 @@ from models import Unit, Lesson, Exercise, User, Progress, Child, UserRole
 import schemas
 from routers.auth import require_admin, get_current_user
 
-router = APIRouter(prefix="/api/v1", tags=["Admin & Curriculum"])
+router = APIRouter(tags=["Admin & Curriculum"])
 
 
 # ── Лог действий (in-memory, достаточно для оценки) ──────────────────────────

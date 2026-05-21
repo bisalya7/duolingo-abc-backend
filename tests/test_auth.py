@@ -1,15 +1,15 @@
 from fastapi.testclient import TestClient
 from main import app  
+import uuid
 
 client = TestClient(app)
 
 def test_register_user():
-    import uuid
     test_email = f"test_{uuid.uuid4()}@mail.com"
     test_password = "password123"
 
     response = client.post(
-        "/register",
+        "/api/v1/auth/register",
         json={"email": test_email, "password": test_password}
     )
     
@@ -20,7 +20,7 @@ def test_register_user():
 
 def test_login_user():
     response = client.post(
-        "/login",
+        "/api/v1/auth/login",
         data={"username": "wrong@mail.com", "password": "wrongpassword"}
     )
     

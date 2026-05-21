@@ -1,0 +1,200 @@
+2026-05-21 22:15:54,195 - routers.auth - INFO - Registration attempt: user@example.com
+2026-05-21 22:15:54,247 - routers.auth - ERROR - Registration failed: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец users.created_at не существует
+LINE 1: ...AS users_password_hash, users.role AS users_role, users.crea...
+                                                             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.role AS users_role, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'user@example.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-05-21 22:15:54,249 - database - ERROR - DB session error: 500: Registration failed: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец users.created_at не существует
+LINE 1: ...AS users_password_hash, users.role AS users_role, users.crea...
+                                                             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.role AS users_role, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'user@example.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-05-21 22:20:16,842 - routers.auth - INFO - Registration attempt: user@example.com
+2026-05-21 22:20:16,890 - routers.auth - ERROR - Registration failed: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец users.created_at не существует
+LINE 1: ...AS users_password_hash, users.role AS users_role, users.crea...
+                                                             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.role AS users_role, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'user@example.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-05-21 22:20:16,891 - database - ERROR - DB session error: 500: Registration failed: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец users.created_at не существует
+LINE 1: ...AS users_password_hash, users.role AS users_role, users.crea...
+                                                             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.role AS users_role, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'user@example.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-05-21 22:25:03,551 - routers.auth - INFO - Registration attempt: user@example.com
+2026-05-21 22:25:03,555 - routers.auth - ERROR - Registration failed: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец users.created_at не существует
+LINE 1: ...AS users_password_hash, users.role AS users_role, users.crea...
+                                                             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.role AS users_role, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'user@example.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-05-21 22:25:03,556 - database - ERROR - DB session error: 500: Registration failed: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец users.created_at не существует
+LINE 1: ...AS users_password_hash, users.role AS users_role, users.crea...
+                                                             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.role AS users_role, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'user@example.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-05-21 22:25:04,362 - routers.auth - INFO - Registration attempt: user@example.com
+2026-05-21 22:25:04,366 - routers.auth - ERROR - Registration failed: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец users.created_at не существует
+LINE 1: ...AS users_password_hash, users.role AS users_role, users.crea...
+                                                             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.role AS users_role, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'user@example.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-05-21 22:25:04,367 - database - ERROR - DB session error: 500: Registration failed: (psycopg2.errors.UndefinedColumn) ОШИБКА:  столбец users.created_at не существует
+LINE 1: ...AS users_password_hash, users.role AS users_role, users.crea...
+                                                             ^
+
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.role AS users_role, users.created_at AS users_created_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'user@example.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2026-05-21 22:26:59,391 - routers.auth - INFO - Registration attempt: user@example.com
+2026-05-21 22:26:59,956 - routers.auth - INFO - User registered successfully: user@example.com
+2026-05-21 22:27:25,392 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-05-21 22:27:25,392 - python_multipart.multipart - DEBUG - Calling on_field_name with data[0:8]
+2026-05-21 22:27:25,393 - python_multipart.multipart - DEBUG - Calling on_field_data with data[9:26]
+2026-05-21 22:27:25,393 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-05-21 22:27:25,393 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-05-21 22:27:25,394 - python_multipart.multipart - DEBUG - Calling on_field_name with data[27:35]
+2026-05-21 22:27:25,394 - python_multipart.multipart - DEBUG - Calling on_field_data with data[36:42]
+2026-05-21 22:27:25,394 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-05-21 22:27:25,395 - python_multipart.multipart - DEBUG - Calling on_end with no data
+2026-05-21 22:27:25,397 - routers.auth - INFO - Login attempt: dasd2@gmail.com
+2026-05-21 22:27:25,400 - routers.auth - WARNING - Failed login: dasd2@gmail.com
+2026-05-21 22:27:25,401 - database - ERROR - DB session error: 401: Неверный email или пароль
+2026-05-21 22:27:26,696 - routers.auth - INFO - Registration attempt: dasd2@gmail.com
+2026-05-21 22:27:27,212 - routers.auth - INFO - User registered successfully: dasd2@gmail.com
+2026-05-21 22:27:29,142 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-05-21 22:27:29,143 - python_multipart.multipart - DEBUG - Calling on_field_name with data[0:8]
+2026-05-21 22:27:29,143 - python_multipart.multipart - DEBUG - Calling on_field_data with data[9:26]
+2026-05-21 22:27:29,143 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-05-21 22:27:29,143 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-05-21 22:27:29,144 - python_multipart.multipart - DEBUG - Calling on_field_name with data[27:35]
+2026-05-21 22:27:29,144 - python_multipart.multipart - DEBUG - Calling on_field_data with data[36:42]
+2026-05-21 22:27:29,144 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-05-21 22:27:29,145 - python_multipart.multipart - DEBUG - Calling on_end with no data
+2026-05-21 22:27:29,147 - routers.auth - INFO - Login attempt: dasd2@gmail.com
+2026-05-21 22:27:29,644 - routers.auth - INFO - Refresh token created for user_id=2
+2026-05-21 22:27:29,644 - routers.auth - INFO - Login successful: dasd2@gmail.com
+2026-05-21 22:58:20,487 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-05-21 22:58:20,488 - python_multipart.multipart - DEBUG - Calling on_field_name with data[0:8]
+2026-05-21 22:58:20,488 - python_multipart.multipart - DEBUG - Calling on_field_data with data[9:26]
+2026-05-21 22:58:20,489 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-05-21 22:58:20,489 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-05-21 22:58:20,489 - python_multipart.multipart - DEBUG - Calling on_field_name with data[27:35]
+2026-05-21 22:58:20,490 - python_multipart.multipart - DEBUG - Calling on_field_data with data[36:42]
+2026-05-21 22:58:20,491 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-05-21 22:58:20,491 - python_multipart.multipart - DEBUG - Calling on_end with no data
+2026-05-21 22:58:20,493 - routers.auth - INFO - Login attempt: dasd2@gmail.com
+2026-05-21 22:58:21,034 - routers.auth - INFO - Refresh token created for user_id=2
+2026-05-21 22:58:21,034 - routers.auth - INFO - Login successful: dasd2@gmail.com
+2026-05-21 22:58:53,279 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-05-21 22:58:53,279 - python_multipart.multipart - DEBUG - Calling on_field_name with data[0:8]
+2026-05-21 22:58:53,279 - python_multipart.multipart - DEBUG - Calling on_field_data with data[9:26]
+2026-05-21 22:58:53,280 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-05-21 22:58:53,280 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-05-21 22:58:53,280 - python_multipart.multipart - DEBUG - Calling on_field_name with data[27:35]
+2026-05-21 22:58:53,281 - python_multipart.multipart - DEBUG - Calling on_field_data with data[36:42]
+2026-05-21 22:58:53,281 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-05-21 22:58:53,281 - python_multipart.multipart - DEBUG - Calling on_end with no data
+2026-05-21 22:58:53,283 - routers.auth - INFO - Login attempt: dasd2@gmail.com
+2026-05-21 22:58:53,784 - routers.auth - INFO - Refresh token created for user_id=2
+2026-05-21 22:58:53,785 - routers.auth - INFO - Login successful: dasd2@gmail.com
+2026-05-21 23:02:32,808 - routers.auth - INFO - Registration attempt: dasd22@gmail.com
+2026-05-21 23:02:33,338 - routers.auth - INFO - User registered successfully: dasd22@gmail.com
+2026-05-21 23:02:34,973 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-05-21 23:02:34,973 - python_multipart.multipart - DEBUG - Calling on_field_name with data[0:8]
+2026-05-21 23:02:34,974 - python_multipart.multipart - DEBUG - Calling on_field_data with data[9:27]
+2026-05-21 23:02:34,974 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-05-21 23:02:34,975 - python_multipart.multipart - DEBUG - Calling on_field_start with no data
+2026-05-21 23:02:34,975 - python_multipart.multipart - DEBUG - Calling on_field_name with data[28:36]
+2026-05-21 23:02:34,975 - python_multipart.multipart - DEBUG - Calling on_field_data with data[37:43]
+2026-05-21 23:02:34,976 - python_multipart.multipart - DEBUG - Calling on_field_end with no data
+2026-05-21 23:02:34,977 - python_multipart.multipart - DEBUG - Calling on_end with no data
+2026-05-21 23:02:34,979 - routers.auth - INFO - Login attempt: dasd22@gmail.com
+2026-05-21 23:02:35,517 - routers.auth - INFO - Refresh token created for user_id=3
+2026-05-21 23:02:35,517 - routers.auth - INFO - Login successful: dasd22@gmail.com
+2026-05-21 23:18:47,265 - database - ERROR - DB session error: 1 validation error:
+  {'type': 'missing', 'loc': ('body', 'lesson_id'), 'msg': 'Field required', 'input': {'child_id': '2', 'score': 4}}
+
+  File "C:\duolingo_project\routers\learning.py", line 13, in finish_lesson
+    POST /api/v1/learning/lessons/{lesson_id}/complete
+2026-05-21 23:18:47,267 - database - ERROR - DB session error: 1 validation error:
+  {'type': 'missing', 'loc': ('body', 'lesson_id'), 'msg': 'Field required', 'input': {'child_id': '2', 'score': 4}}
+
+  File "C:\duolingo_project\routers\learning.py", line 13, in finish_lesson
+    POST /api/v1/learning/lessons/{lesson_id}/complete
+2026-05-21 23:19:19,257 - database - ERROR - DB session error: 1 validation error:
+  {'type': 'missing', 'loc': ('body', 'lesson_id'), 'msg': 'Field required', 'input': {'child_id': '2', 'score': 5}}
+
+  File "C:\duolingo_project\routers\learning.py", line 13, in finish_lesson
+    POST /api/v1/learning/lessons/{lesson_id}/complete
+2026-05-21 23:19:19,259 - database - ERROR - DB session error: 1 validation error:
+  {'type': 'missing', 'loc': ('body', 'lesson_id'), 'msg': 'Field required', 'input': {'child_id': '2', 'score': 5}}
+
+  File "C:\duolingo_project\routers\learning.py", line 13, in finish_lesson
+    POST /api/v1/learning/lessons/{lesson_id}/complete
+2026-05-21 23:27:46,054 - database - ERROR - DB session error: 1 validation error:
+  {'type': 'missing', 'loc': ('body', 'lesson_id'), 'msg': 'Field required', 'input': {'child_id': '2', 'score': 5}}
+
+  File "C:\duolingo_project\routers\learning.py", line 13, in finish_lesson
+    POST /api/v1/learning/lessons/{lesson_id}/complete
+2026-05-21 23:27:46,064 - database - ERROR - DB session error: 1 validation error:
+  {'type': 'missing', 'loc': ('body', 'lesson_id'), 'msg': 'Field required', 'input': {'child_id': '2', 'score': 5}}
+
+  File "C:\duolingo_project\routers\learning.py", line 13, in finish_lesson
+    POST /api/v1/learning/lessons/{lesson_id}/complete
+2026-05-21 23:28:40,435 - database - ERROR - DB session error: 1 validation error:
+  {'type': 'missing', 'loc': ('body', 'lesson_id'), 'msg': 'Field required', 'input': {'child_id': '2', 'score': 5}}
+
+  File "C:\duolingo_project\routers\learning.py", line 13, in finish_lesson
+    POST /api/v1/learning/lessons/{lesson_id}/complete
+2026-05-21 23:28:40,435 - database - ERROR - DB session error: 1 validation error:
+  {'type': 'missing', 'loc': ('body', 'lesson_id'), 'msg': 'Field required', 'input': {'child_id': '2', 'score': 5}}
+
+  File "C:\duolingo_project\routers\learning.py", line 13, in finish_lesson
+    POST /api/v1/learning/lessons/{lesson_id}/complete
+2026-05-21 23:29:08,716 - database - ERROR - DB session error: 1 validation error:
+  {'type': 'missing', 'loc': ('body', 'lesson_id'), 'msg': 'Field required', 'input': {'child_id': '3', 'score': 4}}
+
+  File "C:\duolingo_project\routers\learning.py", line 13, in finish_lesson
+    POST /api/v1/learning/lessons/{lesson_id}/complete
+2026-05-21 23:29:08,718 - database - ERROR - DB session error: 1 validation error:
+  {'type': 'missing', 'loc': ('body', 'lesson_id'), 'msg': 'Field required', 'input': {'child_id': '3', 'score': 4}}
+
+  File "C:\duolingo_project\routers\learning.py", line 13, in finish_lesson
+    POST /api/v1/learning/lessons/{lesson_id}/complete

@@ -8,6 +8,22 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from database import get_db
 from models import User
+from routers.auth import ( hash_password,
+    verify_password,
+    create_access_token,
+    get_current_user,
+    require_admin,
+    require_parent,
+)
+ 
+__all__ = [
+    "hash_password",
+    "verify_password",
+    "create_access_token",
+    "get_current_user",
+    "require_admin",
+    "require_parent",
+]
 
 load_dotenv()
 

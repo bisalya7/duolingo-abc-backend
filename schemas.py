@@ -34,6 +34,7 @@ class ExerciseResponse(BaseModel):
     id: int
     type: str
     content: Any
+    answer: Optional[str] = None  # ← добавить эту строку
 
     class Config:
         from_attributes = True
@@ -44,6 +45,7 @@ class LessonResponse(BaseModel):
     title: str
     order: int
     xp_reward: int
+    unit_id: int = 0          # ← добавить
     exercises: List[ExerciseResponse] = []
 
     class Config:
@@ -51,9 +53,7 @@ class LessonResponse(BaseModel):
 
 class ProgressCreate(BaseModel):
     child_id: int
-    lesson_id: int
     score: int
-
 
 class NotificationResponse(BaseModel):
     id: int

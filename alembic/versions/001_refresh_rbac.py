@@ -14,7 +14,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Добавляем enum тип для роли пользователя
+    # Создаём enum тип для роли пользователя
     userrole = sa.Enum('parent', 'admin', name='userrole')
     userrole.create(op.get_bind(), checkfirst=True)
 
@@ -40,6 +40,13 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # Явно удаляем индексы перед drop_table
+    op.drop_index('ix_refresh_tokens_token',   table_name='refresh_tokens')
+    op.drop_index('ix_refresh_tokens_user_id', table_name='refresh_tokens')
     op.drop_table('refresh_tokens')
+    
+    # Удаляем колонку role из users
     op.drop_column('users', 'role')
+    
+    # Удаляем enum тип (с checkfirst для безопасности)
     sa.Enum(name='userrole').drop(op.get_bind(), checkfirst=True)

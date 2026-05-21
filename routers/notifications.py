@@ -6,7 +6,7 @@ from schemas import NotificationResponse
 from routers.auth import get_current_user
 from socket_manager import manager
 
-router = APIRouter(prefix="/api/v1/notifications", tags=["Notifications"])
+router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
 
 @router.get("/", response_model=list[NotificationResponse])

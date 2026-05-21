@@ -25,13 +25,13 @@ def check_expired_streaks():
 
         reset_count = 0
         for child in expired_children:
-            child.daily_streak = 0
-            reset_count += 1
-
-            # Уведомляем родителя о сгорании стрика
+            # Уведомляем родителя о сгорании стрика ДО обнуления
             if child.daily_streak >= 3:  # Только если стрик был значимый
                 msg = f"🔥 Стрик {child.name} сгорел! Ребёнок не занимался вчера."
                 db.add(Notification(user_id=child.parent_id, message=msg))
+
+            child.daily_streak = 0
+            reset_count += 1
 
         db.commit()
         return {

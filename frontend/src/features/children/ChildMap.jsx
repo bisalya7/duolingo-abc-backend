@@ -36,13 +36,24 @@ export default function ChildMap() {
       );
       setCompletedIds(done);
 
-      const lessonsList = (lessonsData.items || lessonsData || []).map((lesson, index) => {
-        const isCompleted = done.has(lesson.id);
-        const prevLesson = index > 0 ? lessonsData.items?.[index - 1] || lessonsData[index - 1] : null;
-        const isLocked = index > 0 && !done.has(prevLesson?.id);
+      // ... (внутри loadData)
 
-        return { ...lesson, isCompleted, isLocked };
-      });
+     const lessonsList = (lessonsData.items || lessonsData || [])
+  .sort((a, b) => {
+    // Сначала по unit_id, потом по order внутри раздела
+    if ((a.unit_id || 0) !== (b.unit_id || 0)) {
+      return (a.unit_id || 0) - (b.unit_id || 0);
+    }
+    return (a.order || 0) - (b.order || 0);
+  })
+  .map((lesson, index, sortedLessons) => {
+    const isCompleted = done.has(lesson.id);
+    const prevLesson = index > 0 ? sortedLessons[index - 1] : null;
+    const isLocked = index > 0 && prevLesson && !done.has(prevLesson.id);
+    return { ...lesson, isCompleted, isLocked };
+  });
+
+// ... (остальное без изменений)
 
       setLessons(lessonsList);
     } catch (e) {

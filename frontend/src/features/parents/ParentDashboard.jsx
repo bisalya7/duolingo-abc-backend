@@ -34,22 +34,47 @@ export default function ParentDashboard() {
     return () => wsRef.current?.close();
   }, []);
 
+  // ... (начало файла без изменений до connectWebSocket)
+
   const connectWebSocket = () => {
     const token = localStorage.getItem('token');
     if (!token) return;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const userId = payload.sub;
-      const wsUrl = `ws://localhost:8000/api/v1/notifications/ws/${userId}`;
+      
+      // ИСПРАВЛЕНО: динамический URL вместо хардкода
+      const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8001')
+        .replace(/^http/, 'ws')
+        .replace(/^https/, 'wss');
+      const wsUrl = `${baseUrl}/api/v1/notifications/ws/${userId}`;
+      
+      console.log('Connecting WebSocket:', wsUrl);
       wsRef.current = new WebSocket(wsUrl);
 
+      wsRef.current.onopen = () => {
+        console.log('WebSocket connected');
+      };
+      
+      wsRef.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      
       wsRef.current.onmessage = (event) => {
         setWsMessage(event.data);
         setTimeout(() => setWsMessage(null), 5000);
         fetchNotifications();
       };
-    } catch (e) {}
+      
+      wsRef.current.onclose = () => {
+        console.log('WebSocket disconnected');
+      };
+    } catch (e) {
+      console.error('WebSocket setup error:', e);
+    }
   };
+
+// ... (остальное без изменений)
 
   const fetchAll = async () => {
     setLoading(true);

@@ -20,7 +20,7 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8000:8000"
+      - "8001:8001"
     environment:
       - DATABASE_URL=postgresql://admin:adminpassword@db:5432/duolingo_abc_db
       - REDIS_URL=redis://redis:6379/0
@@ -28,7 +28,7 @@ services:
     depends_on:
       - db
       - redis
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
     volumes:
       - ./backend:/app
 

@@ -26,7 +26,7 @@ export default function AuthPage() {
           window.location.replace('/select');
         }
       } else {
-        await api.register(data);
+        await api.register(data.email, data.password);
         setIsLogin(true);
         alert('Успешная регистрация! Теперь войдите в систему.');
       }

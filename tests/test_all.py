@@ -32,8 +32,8 @@ def unique_email():
 
 def register_and_login(password="pass123"):
     email = unique_email()
-    client.post("/register", json={"email": email, "password": password})
-    r = client.post("/login", data={"username": email, "password": password})
+    client.post("/api/v1/auth/register", json={"email": email, "password": password})
+    r = client.post("/api/v1/auth/login", data={"username": email, "password": password})
     return r.json().get("access_token"), email
 
 def auth_headers(token):
@@ -41,14 +41,14 @@ def auth_headers(token):
 
 
 def test_register_success():
-    r = client.post("/register", json={"email": unique_email(), "password": "pass123"})
+    r = client.post("/api/v1/auth/register", json={"email": unique_email(), "password": "pass123"})
     assert r.status_code == 200
     assert "message" in r.json()
 
 def test_register_duplicate_email():
     email = unique_email()
-    client.post("/register", json={"email": email, "password": "pass123"})
-    r = client.post("/register", json={"email": email, "password": "pass123"})
+    client.post("/api/v1/auth/register", json={"email": email, "password": "pass123"})
+    r = client.post("/api/v1/auth/register", json={"email": email, "password": "pass123"})
     assert r.status_code == 400
 
 def test_login_success():
@@ -57,18 +57,18 @@ def test_login_success():
 
 def test_login_wrong_password():
     email = unique_email()
-    client.post("/register", json={"email": email, "password": "correct"})
-    r = client.post("/login", data={"username": email, "password": "wrong"})
+    client.post("/api/v1/auth/register", json={"email": email, "password": "correct"})
+    r = client.post("/api/v1/auth/login", data={"username": email, "password": "wrong"})
     assert r.status_code == 401
 
 def test_login_nonexistent_user():
-    r = client.post("/login", data={"username": unique_email(), "password": "pass"})
+    r = client.post("/api/v1/auth/login", data={"username": unique_email(), "password": "pass"})
     assert r.status_code == 401
 
 
 def test_create_child():
     token, _ = register_and_login()
-    r = client.post("/children/", json={"name": "Аня", "age": 5}, headers=auth_headers(token))
+    r = client.post("/api/v1/children/", json={"name": "Аня", "age": 5}, headers=auth_headers(token))
     assert r.status_code == 200
     assert r.json()["name"] == "Аня"
     assert r.json()["level"] == 1
@@ -76,12 +76,12 @@ def test_create_child():
 
 def test_get_children_empty_for_new_user():
     token, _ = register_and_login()
-    r = client.get("/children/", headers=auth_headers(token))
+    r = client.get("/api/v1/children/", headers=auth_headers(token))
     assert r.status_code == 200
     assert r.json() == []
 
 def test_unauthorized_access():
-    r = client.get("/children/")
+    r = client.get("/api/v1/children/")
     assert r.status_code == 401
 
 def test_child_isolation():
@@ -89,28 +89,28 @@ def test_child_isolation():
     token1, _ = register_and_login()
     token2, _ = register_and_login()
 
-    r = client.post("/children/", json={"name": "Маша", "age": 4}, headers=auth_headers(token1))
+    r = client.post("/api/v1/children/", json={"name": "Маша", "age": 4}, headers=auth_headers(token1))
     child_id = r.json()["id"]
 
-    r2 = client.get(f"/children/{child_id}", headers=auth_headers(token2))
+    r2 = client.get(f"/api/v1/children/{child_id}", headers=auth_headers(token2))
     assert r2.status_code == 404
 
 def test_update_child():
     token, _ = register_and_login()
-    r = client.post("/children/", json={"name": "Коля", "age": 5}, headers=auth_headers(token))
+    r = client.post("/api/v1/children/", json={"name": "Коля", "age": 5}, headers=auth_headers(token))
     child_id = r.json()["id"]
 
-    r2 = client.put(f"/children/{child_id}", json={"name": "Николай", "age": 6}, headers=auth_headers(token))
+    r2 = client.put(f"/api/v1/children/{child_id}", json={"name": "Николай", "age": 6}, headers=auth_headers(token))
     assert r2.status_code == 200
     assert r2.json()["name"] == "Николай"
 
 def test_delete_child():
     token, _ = register_and_login()
-    r = client.post("/children/", json={"name": "Петя", "age": 7}, headers=auth_headers(token))
+    r = client.post("/api/v1/children/", json={"name": "Петя", "age": 7}, headers=auth_headers(token))
     child_id = r.json()["id"]
 
-    client.delete(f"/children/{child_id}", headers=auth_headers(token))
-    r2 = client.get(f"/children/{child_id}", headers=auth_headers(token))
+    client.delete(f"/api/v1/children/{child_id}", headers=auth_headers(token))
+    r2 = client.get(f"/api/v1/children/{child_id}", headers=auth_headers(token))
     assert r2.status_code == 404
 
 
@@ -241,7 +241,6 @@ def test_100xp_badge():
         user = User(email=unique_email(), password_hash=hash_password("x"))
         db.add(user); db.commit()
 
-        # Начинаем с 90 XP
         child = Child(name="100XP тест", age=5, parent_id=user.id, total_xp=90, level=1, daily_streak=0)
         db.add(child); db.commit()
 

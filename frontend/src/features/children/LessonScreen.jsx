@@ -357,27 +357,36 @@ export default function LessonScreen() {
     }
   };
 
+  // ... (в конце handleNext)
+
   const handleNext = () => {
     if (currentIndex < exercises.length - 1) {
       setCurrentIndex(prev => prev + 1);
       setSelected(null);
       setStatus('idle');
     } else {
-      const stars = correctCount === exercises.length
-        ? 3
-        : correctCount / exercises.length > 0.6 ? 2 : 1;
+      // ИСПРАВЛЕНО: считаем звёзды на основе ФИНАЛЬНОГО correctCount
+      // Используем callback, чтобы получить актуальное значение
+      setCorrectCount(finalCorrectCount => {
+        const total = exercises.length;
+        const stars = finalCorrectCount === total
+          ? 3
+          : (finalCorrectCount / total) > 0.6 ? 2 : 1;
 
-      api.completeLesson(childId, lessonId, correctCount)
-        .then(() => {
-          navigate(`/child/${childId}/lesson/${lessonId}/results`, {
-            state: { stars, correctCount, total: exercises.length, lessonTitle: 'Урок завершён' },
+        api.completeLesson(childId, lessonId, finalCorrectCount)
+          .then(() => {
+            navigate(`/child/${childId}/lesson/${lessonId}/results`, {
+              state: { stars, correctCount: finalCorrectCount, total, lessonTitle: 'Урок завершён' },
+            });
+          })
+          .catch(() => {
+            navigate(`/child/${childId}/lesson/${lessonId}/results`, {
+              state: { stars, correctCount: finalCorrectCount, total, lessonTitle: 'Урок завершён' },
+            });
           });
-        })
-        .catch(() => {
-          navigate(`/child/${childId}/lesson/${lessonId}/results`, {
-            state: { stars, correctCount, total: exercises.length, lessonTitle: 'Урок завершён' },
-          });
-        });
+        
+        return finalCorrectCount; // Не меняем состояние
+      });
     }
   };
 
@@ -428,9 +437,9 @@ export default function LessonScreen() {
             {exercise.type === 'select_image' && (
               <ImageExercise exercise={exercise} selected={selected} onSelect={setSelected} status={status} />
             )}
-            {exercise.type === 'listen' && (
-              <ListenExercise exercise={exercise} selected={selected} onSelect={setSelected} status={status} />
-            )}
+            {(exercise.type === 'listen' || exercise.type === 'audio') && (
+  <ListenExercise exercise={exercise} selected={selected} onSelect={setSelected} status={status} />
+)}
             {exercise.type === 'multiple_choice' && (
               <MultipleChoiceExercise exercise={exercise} selected={selected} onSelect={setSelected} status={status} />
             )}
@@ -449,7 +458,7 @@ export default function LessonScreen() {
                 status={status}
               />
             )}
-            {!['match', 'select_image', 'listen', 'multiple_choice', 'build_word', 'handwriting'].includes(exercise.type) && (
+           {!['match', 'select_image', 'listen', 'audio', 'multiple_choice', 'build_word', 'handwriting'].includes(exercise.type) && (
               <div className="text-center text-gray-400 font-black">
                 Неизвестный тип задания: {exercise.type}
               </div>
