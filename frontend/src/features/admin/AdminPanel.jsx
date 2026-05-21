@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, BookOpen, ChevronDown, ChevronRight,
-  Plus, Pencil, Trash2, X, Check, Users, BarChart2, LogOut,
+  LayoutDashboard, BookOpen, Users, FileText, ChevronDown, ChevronRight,
+  Plus, Pencil, Trash2, X, Check, LogOut, Search, ChevronLeft,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 
+// ── Reusable Components ──────────────────────────────────────────────
 
 function StatCard({ icon, label, value, color }) {
   return (
@@ -44,7 +45,6 @@ function Modal({ title, onClose, children }) {
   );
 }
 
-// 
 function Field({ label, ...props }) {
   return (
     <div>
@@ -73,6 +73,8 @@ function Btn({ children, variant = 'primary', size = 'md', ...props }) {
   );
 }
 
+// ── Dashboard Tab ──────────────────────────────────────────────────────
+
 function DashboardTab() {
   const [stats, setStats] = useState(null);
 
@@ -100,6 +102,8 @@ function DashboardTab() {
   );
 }
 
+// ── Curriculum Tab (твой текущий, без изменений) ──────────────────────
+
 function CurriculumTab() {
   const [units, setUnits] = useState([]);
   const [expandedUnits, setExpandedUnits] = useState({});
@@ -108,9 +112,7 @@ function CurriculumTab() {
   const [exercisesByLesson, setExercisesByLesson] = useState({});
   const [loading, setLoading] = useState(true);
 
-  const [modal, setModal] = useState(null); // { type, data? }
-
-  
+  const [modal, setModal] = useState(null);
   const [unitForm, setUnitForm] = useState({ title: '', order: '' });
   const [lessonForm, setLessonForm] = useState({ title: '', order: '', xp_reward: '10', unit_id: '' });
   const [exForm, setExForm] = useState({ type: 'match', question: '', options: '', correct_answer: '', lesson_id: '' });
@@ -226,9 +228,9 @@ function CurriculumTab() {
     } catch { alert('Ошибка удаления'); }
   };
 
-  const EX_TYPES = ['match', 'select_image', 'listen', 'build_word', 'multiple_choice'];
-  const EX_LABELS = { match: 'Сопоставление', select_image: 'Выбор картинки', listen: 'Аудирование', build_word: 'Собери слово', multiple_choice: 'Тест' };
-  const EX_ICONS = { match: '🔤', select_image: '🖼️', listen: '🔊', build_word: '🧩', multiple_choice: '✅' };
+  const EX_TYPES = ['match', 'select_image', 'listen', 'build_word', 'multiple_choice', 'handwriting'];
+  const EX_LABELS = { match: 'Сопоставление', select_image: 'Выбор картинки', listen: 'Аудирование', build_word: 'Собери слово', multiple_choice: 'Тест', handwriting: 'Письмо' };
+  const EX_ICONS = { match: '🔤', select_image: '🖼️', listen: '🔊', build_word: '🧩', multiple_choice: '✅', handwriting: '✏️' };
 
   if (loading) {
     return (
@@ -258,7 +260,6 @@ function CurriculumTab() {
       <div className="space-y-3">
         {units.map((unit) => (
           <div key={unit.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-
             <div className="flex items-center gap-3 px-6 py-4">
               <button
                 onClick={() => toggleUnit(unit.id)}
@@ -310,7 +311,6 @@ function CurriculumTab() {
                     ) : (
                       (lessonsByUnit[unit.id] ?? []).map((lesson) => (
                         <div key={lesson.id} className="bg-gray-50 rounded-2xl overflow-hidden">
-
                           <div className="flex items-center gap-3 px-4 py-3">
                             <button
                               onClick={() => toggleLesson(lesson.id)}
@@ -498,9 +498,242 @@ function CurriculumTab() {
   );
 }
 
+// ── User Manager Tab ───────────────────────────────────────────────────
+
+function UserManagerTab() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 10;
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await api.getAdminUsers({ page, limit, search });
+      setUsers(data.items ?? []);
+      setTotal(data.total ?? 0);
+    } catch {
+      setUsers([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [page, search]);
+
+  const totalPages = Math.ceil(total / limit);
+
+  return (
+    <div>
+      <h2 className="text-2xl font-black text-[#3c3c3c] mb-6">Пользователи</h2>
+
+      <div className="flex gap-3 mb-6">
+        <div className="flex-1 relative">
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Поиск по email..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            className="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border-2 border-gray-100 focus:border-[#1cb0f6] outline-none font-bold text-[#3c3c3c] placeholder:text-gray-300"
+          />
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-20">
+          <div className="w-10 h-10 border-4 border-[#1cb0f6] border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : users.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-3xl border border-gray-100">
+          <p className="text-5xl mb-3">👤</p>
+          <p className="font-black text-[#3c3c3c] text-lg">Пользователей не найдено</p>
+        </div>
+      ) : (
+        <>
+          <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="text-left px-6 py-4 font-black text-gray-400 uppercase tracking-widest text-xs">ID</th>
+                  <th className="text-left px-6 py-4 font-black text-gray-400 uppercase tracking-widest text-xs">Email</th>
+                  <th className="text-left px-6 py-4 font-black text-gray-400 uppercase tracking-widest text-xs">Роль</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {users.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 font-bold text-[#3c3c3c]">#{user.id}</td>
+                    <td className="px-6 py-4 font-bold text-[#3c3c3c]">{user.email}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-block px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider ${
+                        user.role === 'admin'
+                          ? 'bg-purple-50 text-purple-500 border border-purple-200'
+                          : 'bg-blue-50 text-[#1cb0f6] border border-blue-200'
+                      }`}>
+                        {user.role}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-6">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-2 rounded-xl bg-white border-2 border-gray-100 text-gray-400 hover:text-[#1cb0f6] hover:border-[#1cb0f6] disabled:opacity-40 transition-all"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <span className="font-black text-[#3c3c3c] text-sm">
+                Страница {page} из {totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="p-2 rounded-xl bg-white border-2 border-gray-100 text-gray-400 hover:text-[#1cb0f6] hover:border-[#1cb0f6] disabled:opacity-40 transition-all"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Activity Log Tab ───────────────────────────────────────────────────
+
+function ActivityLogTab() {
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 20;
+
+  const fetchLogs = async () => {
+    setLoading(true);
+    try {
+      const data = await api.getAdminLogs({ page, limit });
+      setLogs(data.logs ?? []);
+      setTotal(data.total ?? 0);
+    } catch {
+      setLogs([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLogs();
+  }, [page]);
+
+  const totalPages = Math.ceil(total / limit);
+
+  const actionColors = {
+    CREATE_UNIT: 'bg-green-50 text-green-600 border-green-200',
+    UPDATE_UNIT: 'bg-blue-50 text-blue-600 border-blue-200',
+    DELETE_UNIT: 'bg-red-50 text-red-600 border-red-200',
+    CREATE_LESSON: 'bg-green-50 text-green-600 border-green-200',
+    UPDATE_LESSON: 'bg-blue-50 text-blue-600 border-blue-200',
+    DELETE_LESSON: 'bg-red-50 text-red-600 border-red-200',
+    CREATE_EXERCISE: 'bg-green-50 text-green-600 border-green-200',
+    UPDATE_EXERCISE: 'bg-blue-50 text-blue-600 border-blue-200',
+    DELETE_EXERCISE: 'bg-red-50 text-red-600 border-red-200',
+  };
+
+  return (
+    <div>
+      <h2 className="text-2xl font-black text-[#3c3c3c] mb-6">Лог действий</h2>
+
+      {loading ? (
+        <div className="flex justify-center py-20">
+          <div className="w-10 h-10 border-4 border-[#1cb0f6] border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : logs.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-3xl border border-gray-100">
+          <p className="text-5xl mb-3">📋</p>
+          <p className="font-black text-[#3c3c3c] text-lg">Логов пока нет</p>
+          <p className="text-gray-400 font-bold mt-1">Действия админов будут отображаться здесь</p>
+        </div>
+      ) : (
+        <>
+          <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="text-left px-6 py-4 font-black text-gray-400 uppercase tracking-widest text-xs">Время</th>
+                  <th className="text-left px-6 py-4 font-black text-gray-400 uppercase tracking-widest text-xs">Админ</th>
+                  <th className="text-left px-6 py-4 font-black text-gray-400 uppercase tracking-widest text-xs">Действие</th>
+                  <th className="text-left px-6 py-4 font-black text-gray-400 uppercase tracking-widest text-xs">Детали</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {logs.map((log, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 text-gray-400 font-bold whitespace-nowrap">
+                      {new Date(log.timestamp).toLocaleString('ru-RU')}
+                    </td>
+                    <td className="px-6 py-4 font-bold text-[#3c3c3c]">{log.email}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-block px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider border ${actionColors[log.action] ?? 'bg-gray-50 text-gray-500 border-gray-200'}`}>
+                        {log.action}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-500 font-bold text-xs">{log.detail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-6">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-2 rounded-xl bg-white border-2 border-gray-100 text-gray-400 hover:text-[#1cb0f6] hover:border-[#1cb0f6] disabled:opacity-40 transition-all"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <span className="font-black text-[#3c3c3c] text-sm">
+                Страница {page} из {totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="p-2 rounded-xl bg-white border-2 border-gray-100 text-gray-400 hover:text-[#1cb0f6] hover:border-[#1cb0f6] disabled:opacity-40 transition-all"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Main Admin Panel ───────────────────────────────────────────────────
+
 const TABS = [
   { id: 'dashboard', label: 'Дашборд', icon: <LayoutDashboard size={18} /> },
   { id: 'curriculum', label: 'Учебный план', icon: <BookOpen size={18} /> },
+  { id: 'users', label: 'Пользователи', icon: <Users size={18} /> },
+  { id: 'logs', label: 'Логи', icon: <FileText size={18} /> },
 ];
 
 export default function AdminPanel() {
@@ -555,6 +788,8 @@ export default function AdminPanel() {
           >
             {activeTab === 'dashboard' && <DashboardTab />}
             {activeTab === 'curriculum' && <CurriculumTab />}
+            {activeTab === 'users' && <UserManagerTab />}
+            {activeTab === 'logs' && <ActivityLogTab />}
           </motion.div>
         </AnimatePresence>
       </main>
