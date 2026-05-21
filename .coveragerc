@@ -1,0 +1,6 @@
+[run]
+omit =
+    seed_db.py
+    fix_db.py
+    tests/*
+    alembic/*

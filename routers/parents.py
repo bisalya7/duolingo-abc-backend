@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-router = APIRouter(prefix="/api/v1/parents", tags=["Parents & Notifications"])
+router = APIRouter(prefix="/parents", tags=["Parents & Notifications"])
 
 @router.get("/{parent_id}")
 def get_parent_profile(parent_id: int):

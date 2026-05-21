@@ -1,40 +1,130 @@
 from typing import List, Optional, Any
 from pydantic import BaseModel, EmailStr
+from datetime import datetime
+
 
 class Token(BaseModel):
     access_token: str
     token_type: str
 
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
+
 
 class ChildCreate(BaseModel):
     name: str
     age: int
 
+
 class ChildResponse(BaseModel):
     id: int
     name: str
     age: int
-    level: int
-    total_xp: int
-    class Config: from_attributes = True
+    level: int = 1
+    total_xp: int = 0
+    daily_streak: int = 0
+
+    class Config:
+        from_attributes = True
+
 
 class ExerciseResponse(BaseModel):
     id: int
     type: str
     content: Any
-    class Config: from_attributes = True
+    answer: Optional[str] = None  # ← добавить эту строку
+
+    class Config:
+        from_attributes = True
+
 
 class LessonResponse(BaseModel):
     id: int
     title: str
     order: int
     xp_reward: int
+    unit_id: int = 0          # ← добавить
     exercises: List[ExerciseResponse] = []
-    class Config: from_attributes = True
+
+    class Config:
+        from_attributes = True
 
 class ProgressCreate(BaseModel):
-    lesson_id: int
+    child_id: int
     score: int
+
+class NotificationResponse(BaseModel):
+    id: int
+    message: str
+    is_read: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class LeaderboardEntry(BaseModel):
+    rank: int
+    child_name: str
+    total_xp: int
+    level: int
+
+
+class BadgeResponse(BaseModel):
+    id: int
+    name: str
+    description: str
+    icon_url: str
+    earned_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ProgressUpdate(BaseModel):
+    xp_added: int
+
+class UnitCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    order: int
+
+class UnitUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    order: Optional[int] = None
+
+class UnitResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    order: int
+    
+    class Config:
+        from_attributes = True
+
+class LessonCreate(BaseModel):
+    unit_id: int
+    title: str
+    order: int
+    xp_reward: int = 10 
+
+class LessonUpdate(BaseModel):
+    title: Optional[str] = None
+    order: Optional[int] = None
+    xp_reward: Optional[int] = None
+    unit_id: Optional[int] = None
+    # schemas.py
+
+class ExerciseCreate(BaseModel):
+    lesson_id: int
+    type: str 
+    content: Any 
+    answer: str
+
+class ExerciseUpdate(BaseModel):
+    type: Optional[str] = None
+    content: Optional[Any] = None
+    answer: Optional[str] = None
