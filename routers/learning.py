@@ -7,7 +7,7 @@ from models import Lesson, Child, User
 from routers.auth import get_current_user
 from socket_manager import manager
 
-router = APIRouter(prefix="/api/v1/learning", tags=["Learning"])
+router = APIRouter(prefix="/learning", tags=["Learning"])
 
 
 @router.post("/lessons/{lesson_id}/complete")

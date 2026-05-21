@@ -11,26 +11,30 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Children's Literacy Platform API",
     description="API для детской платформы обучения грамоте",
-    version="1.0.0"
+    version="1.0.0",
+    docs_url="/api/v1/docs",      # Swagger под /api/v1/docs
+    redoc_url="/api/v1/redoc",    # ReDoc под /api/v1/redoc
+    openapi_url="/api/v1/openapi.json"
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(auth.router)
-app.include_router(children.router)
-app.include_router(learning.router)
-app.include_router(admin.router)
-app.include_router(parents.router)
-app.include_router(notifications.router)
+# Все роутеры под /api/v1/
+app.include_router(auth.router, prefix="/api/v1")
+app.include_router(children.router, prefix="/api/v1")
+app.include_router(learning.router, prefix="/api/v1")
+app.include_router(admin.router, prefix="/api/v1")
+app.include_router(parents.router, prefix="/api/v1")
+app.include_router(notifications.router, prefix="/api/v1")
 
 
-@app.post("/children/{child_id}/progress", response_model=schemas.ChildResponse)
+@app.post("/api/v1/children/{child_id}/progress", response_model=schemas.ChildResponse)
 def update_child_progress(
     child_id: int,
     progress: schemas.ProgressUpdate,

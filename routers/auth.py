@@ -22,7 +22,7 @@ ALGORITHM                     = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES   = 60          # access-токен живёт 1 час
 REFRESH_TOKEN_EXPIRE_DAYS     = 30          # refresh-токен живёт 30 дней
 
-router = APIRouter(tags=["Auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
@@ -152,7 +152,7 @@ def login_user(
     }
 
 
-@router.post("/auth/refresh")
+@router.post("/refresh")
 def refresh_access_token(body: RefreshRequest, db: Session = Depends(get_db)):
     """
     Принимает refresh_token, возвращает новый access_token.
