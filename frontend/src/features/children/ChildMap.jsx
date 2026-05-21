@@ -122,7 +122,12 @@ export default function ChildMap() {
           )}
 
           <div className="flex gap-2">
-            {/* XP */}
+            <button
+              onClick={() => navigate(`/child/${childId}/badges`)}
+              className="bg-yellow-50 border-2 border-yellow-300 text-yellow-600 px-3 py-2 rounded-2xl font-black text-sm hover:bg-yellow-100 transition-all"
+            >
+              🏅
+            </button>
             <div className="bg-[#fff4e0] border-2 border-[#ffd200] text-[#b38600] px-3 py-2 rounded-2xl font-black text-sm flex items-center gap-1">
               ⭐ {child?.total_xp || 0}
             </div>

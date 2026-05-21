@@ -6,20 +6,24 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid
 } from 'recharts';
 import {
-  LogOut, PlusCircle, Play, Star, Flame, Bell, ChevronRight, Trophy, BookOpen, X
+  LogOut, PlusCircle, Play, Star, Flame, Bell, ChevronRight, Trophy, BookOpen, X, Settings
 } from 'lucide-react';
+import StreakCalendar from '../../components/StreakCalendar';
+import BadgeShowcase from '../../components/BadgeShowcase';
+import AccountSettings from './AccountSettings';
 
 export default function ParentDashboard() {
   const [children, setChildren] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [selectedChild, setSelectedChild] = useState(null); // для детального просмотра
+  const [selectedChild, setSelectedChild] = useState(null);
   const [childProgress, setChildProgress] = useState(null);
   const [childBadges, setChildBadges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', age: '' });
   const [showNotifications, setShowNotifications] = useState(false);
-  const [wsMessage, setWsMessage] = useState(null); 
+  const [showSettings, setShowSettings] = useState(false);
+  const [wsMessage, setWsMessage] = useState(null);
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
   const wsRef = useRef(null);
@@ -42,11 +46,9 @@ export default function ParentDashboard() {
       wsRef.current.onmessage = (event) => {
         setWsMessage(event.data);
         setTimeout(() => setWsMessage(null), 5000);
-        // Обновляем список уведомлений
         fetchNotifications();
       };
-    } catch (e) {
-    }
+    } catch (e) {}
   };
 
   const fetchAll = async () => {
@@ -68,12 +70,12 @@ export default function ParentDashboard() {
     try {
       const data = await api.getNotifications();
       setNotifications(data);
-    } catch (e) {
-    }
+    } catch (e) {}
   };
 
   const openChildDetail = async (child) => {
     setSelectedChild(child);
+    setShowSettings(false);
     try {
       const [progress, badges] = await Promise.all([
         api.getChildProgress(child.id),
@@ -165,6 +167,13 @@ export default function ParentDashboard() {
 
           <div className="flex items-center gap-3">
             <button
+              onClick={() => { setShowSettings(!showSettings); setSelectedChild(null); }}
+              className={`p-3 rounded-2xl transition-colors ${showSettings ? 'bg-[#e8f5ff] text-[#1cb0f6]' : 'bg-gray-50 hover:bg-gray-100 text-gray-500'}`}
+            >
+              <Settings size={22} />
+            </button>
+
+            <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative p-3 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors"
             >
@@ -187,6 +196,12 @@ export default function ParentDashboard() {
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8">
+
+        {showSettings && (
+          <div className="mb-8">
+            <AccountSettings onClose={() => setShowSettings(false)} />
+          </div>
+        )}
 
         {showNotifications && (
           <div className="bg-white rounded-3xl shadow-lg border border-gray-100 mb-8 overflow-hidden">
@@ -287,7 +302,11 @@ export default function ParentDashboard() {
                 </button>
                 <button
                   onClick={() => openChildDetail(child)}
-                  className="px-4 py-3 rounded-2xl border-2 border-gray-100 hover:border-[#1cb0f6] text-gray-400 hover:text-[#1cb0f6] transition-all"
+                  className={`px-4 py-3 rounded-2xl border-2 transition-all ${
+                    selectedChild?.id === child.id
+                      ? 'border-[#1cb0f6] text-[#1cb0f6] bg-[#e8f5ff]'
+                      : 'border-gray-100 hover:border-[#1cb0f6] text-gray-400 hover:text-[#1cb0f6]'
+                  }`}
                 >
                   <ChevronRight size={20} />
                 </button>
@@ -363,7 +382,6 @@ export default function ParentDashboard() {
                   ))}
                 </div>
 
-                {/* График XP по дням */}
                 <div className="mb-8">
                   <h3 className="font-black text-[#3c3c3c] mb-4">XP по дням недели</h3>
                   <ResponsiveContainer width="100%" height={180}>
@@ -379,7 +397,6 @@ export default function ParentDashboard() {
                   </ResponsiveContainer>
                 </div>
 
-                {/* График оценок за уроки */}
                 {childProgress.history.length > 0 && (
                   <div className="mb-8">
                     <h3 className="font-black text-[#3c3c3c] mb-4">Звёзды за последние уроки</h3>
@@ -398,7 +415,25 @@ export default function ParentDashboard() {
                   </div>
                 )}
 
-                {/* История уроков */}
+                <div className="mb-8">
+                  <StreakCalendar
+                    history={childProgress?.history || []}
+                    streak={selectedChild?.daily_streak || 0}
+                  />
+                </div>
+
+                <div className="mb-8">
+                  <BadgeShowcase
+                    badges={childBadges}
+                    allBadges={[
+                      { id: 1, name: 'Первый урок', description: 'Пройди первый урок' },
+                      { id: 2, name: '100 XP', description: 'Набери 100 очков' },
+                      { id: 3, name: 'Огонек', description: '3 дня подряд' },
+                      { id: 4, name: 'Марафонец', description: '7 дней подряд' },
+                    ]}
+                  />
+                </div>
+
                 {childProgress.history.length > 0 ? (
                   <div>
                     <h3 className="font-black text-[#3c3c3c] mb-4">История уроков</h3>
@@ -437,24 +472,6 @@ export default function ParentDashboard() {
             ) : (
               <div className="flex justify-center py-12">
                 <div className="w-10 h-10 border-4 border-[#1cb0f6] border-t-transparent rounded-full animate-spin" />
-              </div>
-            )}
-
-            {/* Бейджи */}
-            {childBadges.length > 0 && (
-              <div className="mt-8">
-                <h3 className="font-black text-[#3c3c3c] mb-4">Награды</h3>
-                <div className="flex flex-wrap gap-3">
-                  {childBadges.map((badge) => (
-                    <div key={badge.id} className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl px-4 py-3 flex items-center gap-2">
-                      <span className="text-2xl">🏅</span>
-                      <div>
-                        <p className="font-black text-sm text-[#3c3c3c]">{badge.name}</p>
-                        <p className="text-xs text-gray-400">{badge.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
           </div>
