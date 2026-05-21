@@ -1,4 +1,3 @@
-// frontend/src/store/authStore.js
 import { create } from 'zustand';
 
 const TOKEN_KEY   = 'access_token';
@@ -11,7 +10,6 @@ export const useAuthStore = create((set, get) => ({
   role:            localStorage.getItem(ROLE_KEY)    || null,
   isAuthenticated: !!localStorage.getItem(TOKEN_KEY),
 
-  // Вызывается после успешного login
   setTokens: ({ access_token, refresh_token, role }) => {
     localStorage.setItem(TOKEN_KEY,   access_token);
     localStorage.setItem(REFRESH_KEY, refresh_token);
@@ -24,7 +22,6 @@ export const useAuthStore = create((set, get) => ({
     });
   },
 
-  // Тихое обновление access-токена
   refreshAccessToken: async () => {
     const refresh_token = get().refreshToken;
     if (!refresh_token) return false;
@@ -55,7 +52,6 @@ export const useAuthStore = create((set, get) => ({
   logout: async () => {
     const refresh_token = get().refreshToken;
     const token         = get().token;
-    // Отзываем refresh-токен на сервере (best-effort)
     if (refresh_token && token) {
       fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
         method:  'POST',
@@ -71,4 +67,7 @@ export const useAuthStore = create((set, get) => ({
     localStorage.removeItem(ROLE_KEY);
     set({ token: null, refreshToken: null, role: null, isAuthenticated: false });
   },
+
+  isAdmin: () => get().role === 'admin',
+  isParent: () => get().role === 'parent',
 }));

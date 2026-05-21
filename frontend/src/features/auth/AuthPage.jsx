@@ -6,15 +6,25 @@ import { useAuthStore } from '../../store/authStore';
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
-  const login = useAuthStore((state) => state.login);
+  const setTokens = useAuthStore((state) => state.setTokens);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
     setErrorMsg('');
     try {
       if (isLogin) {
-        const response = await api.login(data);
-        login(response.access_token);
+        const response = await api.login(data.email, data.password);
+        setTokens({
+          access_token: response.access_token,
+          refresh_token: response.refresh_token,
+          role: response.role,
+        });
+        // Редирект по роли
+        if (response.role === 'admin') {
+          window.location.replace('/admin');
+        } else {
+          window.location.replace('/select');
+        }
       } else {
         await api.register(data);
         setIsLogin(true);
@@ -27,7 +37,6 @@ export default function AuthPage() {
       if (typeof rawDetail === 'string') {
         message = rawDetail;
       } else if (Array.isArray(rawDetail) && rawDetail.length > 0) {
-        // ✅ Исправлено: Array.isArray вместо Array.items
         message = rawDetail[0].msg;
       } else if (error.message) {
         message = error.message;
