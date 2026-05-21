@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Volume2 } from 'lucide-react';
 import { api } from '../../services/api';
+import HandwritingExercise from './HandwritingExercise';
 
 const playSound = (url) => {
   const audio = new Audio(url);
@@ -20,6 +21,7 @@ const getCorrect = (ex) => {
   const c = parseContent(ex.content);
   return ex.answer || c.correct_answer || '';
 };
+
 function MatchExercise({ exercise, selected, onSelect, status }) {
   const c = parseContent(exercise.content);
   const options = c.options ?? [];
@@ -56,6 +58,7 @@ function MatchExercise({ exercise, selected, onSelect, status }) {
     </div>
   );
 }
+
 function ImageExercise({ exercise, selected, onSelect, status }) {
   const c = parseContent(exercise.content);
   const options = c.options ?? [];
@@ -105,11 +108,25 @@ function ImageExercise({ exercise, selected, onSelect, status }) {
     </div>
   );
 }
+
 function ListenExercise({ exercise, selected, onSelect, status }) {
   const c = parseContent(exercise.content);
   const options = c.options ?? [];
   const correct = getCorrect(exercise);
   const [playing, setPlaying] = useState(false);
+
+  const fallbackSpeak = useCallback(() => {
+    const textToSpeak = c.letter || correct || c.question;
+    if (!textToSpeak) return;
+    setPlaying(true);
+    const utt = new SpeechSynthesisUtterance(textToSpeak);
+    utt.lang = 'ru-RU';
+    utt.rate = 0.7;
+    utt.onend = () => setPlaying(false);
+    utt.onerror = () => setPlaying(false);
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utt);
+  }, [c.letter, c.question, correct]);
 
   const playTaskAudio = useCallback(() => {
     if (c.audio_url) {
@@ -127,20 +144,7 @@ function ListenExercise({ exercise, selected, onSelect, status }) {
     } else {
       fallbackSpeak();
     }
-  }, [c.audio_url, c.letter, c.text, c.question, correct]);
-
-  const fallbackSpeak = useCallback(() => {
-    const textToSpeak = c.letter || correct || c.question;
-    if (!textToSpeak) return;
-    setPlaying(true);
-    const utt = new SpeechSynthesisUtterance(textToSpeak);
-    utt.lang = 'ru-RU';
-    utt.rate = 0.7;
-    utt.onend = () => setPlaying(false);
-    utt.onerror = () => setPlaying(false);
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utt);
-  }, [c.letter, c.question, correct]);
+  }, [c.audio_url, fallbackSpeak]);
 
   useEffect(() => {
     const timer = setTimeout(playTaskAudio, 500);
@@ -251,7 +255,7 @@ function BuildWordExercise({ exercise, selected, onSelect, status }) {
       setBuilt([]);
       setRemaining(letters.map((l, i) => ({ l, i })));
     }
-  }, [selected, exercise.id]);
+  }, [selected, exercise.id, letters]);
 
   const addLetter = (item) => {
     if (status !== 'idle') return;
@@ -323,7 +327,7 @@ export default function LessonScreen() {
   const [exercises, setExercises]     = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected]       = useState(null);
-  const [status, setStatus]           = useState('idle'); // idle | correct | wrong
+  const [status, setStatus]           = useState('idle');
   const [correctCount, setCorrectCount] = useState(0);
   const [loading, setLoading]         = useState(true);
 
@@ -340,6 +344,7 @@ export default function LessonScreen() {
 
   const handleCheck = () => {
     if (!selected) return;
+    if (status !== 'idle') return;
     const correct = getCorrect(exercise);
 
     if (selected === correct) {
@@ -369,7 +374,6 @@ export default function LessonScreen() {
           });
         })
         .catch(() => {
-          // Даже если API упал — переходим на результаты
           navigate(`/child/${childId}/lesson/${lessonId}/results`, {
             state: { stars, correctCount, total: exercises.length, lessonTitle: 'Урок завершён' },
           });
@@ -433,7 +437,19 @@ export default function LessonScreen() {
             {exercise.type === 'build_word' && (
               <BuildWordExercise exercise={exercise} selected={selected} onSelect={setSelected} status={status} />
             )}
-            {!['match', 'select_image', 'listen', 'multiple_choice', 'build_word'].includes(exercise.type) && (
+            {exercise.type === 'handwriting' && (
+              <HandwritingExercise
+                exercise={exercise}
+                onComplete={(val) => {
+                  setSelected(val);
+                  setStatus('correct');
+                  setCorrectCount(prev => prev + 1);
+                  playSound('/sounds/correct.mp3');
+                }}
+                status={status}
+              />
+            )}
+            {!['match', 'select_image', 'listen', 'multiple_choice', 'build_word', 'handwriting'].includes(exercise.type) && (
               <div className="text-center text-gray-400 font-black">
                 Неизвестный тип задания: {exercise.type}
               </div>
@@ -462,18 +478,35 @@ export default function LessonScreen() {
             )}
           </div>
 
-          <button
-            onClick={status === 'idle' ? handleCheck : handleNext}
-            disabled={status === 'idle' && !selected}
-            className={`px-10 py-4 rounded-2xl font-black text-xl uppercase tracking-wider transition-all
-              ${status === 'idle' && !selected ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : ''}
-              ${status === 'idle' && selected  ? 'bg-[#58cc02] text-white shadow-[0_4px_0_0_#46a302] hover:bg-[#46a302]' : ''}
-              ${status === 'correct' ? 'bg-[#58cc02] text-white shadow-[0_4px_0_0_#46a302]' : ''}
-              ${status === 'wrong'   ? 'bg-[#ff4b4b] text-white shadow-[0_4px_0_0_#cc0000]' : ''}
-            `}
-          >
-            {status === 'idle' ? 'Проверить' : 'Дальше'}
-          </button>
+          {exercise.type !== 'handwriting' && (
+            <button
+              onClick={status === 'idle' ? handleCheck : handleNext}
+              disabled={status === 'idle' && !selected}
+              className={`px-10 py-4 rounded-2xl font-black text-xl uppercase tracking-wider transition-all
+                ${status === 'idle' && !selected ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : ''}
+                ${status === 'idle' && selected  ? 'bg-[#58cc02] text-white shadow-[0_4px_0_0_#46a302] hover:bg-[#46a302]' : ''}
+                ${status === 'correct' ? 'bg-[#58cc02] text-white shadow-[0_4px_0_0_#46a302]' : ''}
+                ${status === 'wrong'   ? 'bg-[#ff4b4b] text-white shadow-[0_4px_0_0_#cc0000]' : ''}
+              `}
+            >
+              {status === 'idle' ? 'Проверить' : 'Дальше'}
+            </button>
+          )}
+
+          {exercise.type === 'handwriting' && status === 'idle' && (
+            <div className="text-gray-400 font-black text-lg">
+              Обведи букву ✏️
+            </div>
+          )}
+
+          {exercise.type === 'handwriting' && status === 'correct' && (
+            <button
+              onClick={handleNext}
+              className="px-10 py-4 rounded-2xl font-black text-xl uppercase tracking-wider bg-[#58cc02] text-white shadow-[0_4px_0_0_#46a302]"
+            >
+              Дальше →
+            </button>
+          )}
         </div>
       </footer>
     </div>

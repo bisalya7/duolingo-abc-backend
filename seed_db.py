@@ -100,6 +100,28 @@ def seed_database():
                 ],
                 "correct_answer": "ПАПА"
             })),
+            Exercise(
+    lesson_id=lesson1.id,
+    type="handwriting",
+    content=json.dumps({
+        "question": "Обведи букву А",
+        "letter": "А",
+        "guide_color": "#e5e5e5",
+        "trace_color": "#1cb0f6"
+    }),
+    answer="А"
+),
+Exercise(
+    lesson_id=lesson2.id,
+    type="handwriting",
+    content=json.dumps({
+        "question": "Обведи букву О",
+        "letter": "О",
+        "guide_color": "#e5e5e5",
+        "trace_color": "#58cc02"
+    }),
+    answer="О"
+),
         ]
 
         db.add_all(exercises)
