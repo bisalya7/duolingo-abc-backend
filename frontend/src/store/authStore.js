@@ -1,16 +1,74 @@
+// frontend/src/store/authStore.js
 import { create } from 'zustand';
 
-export const useAuthStore = create((set) => ({
-  token: localStorage.getItem('token') || null,
-  isAuthenticated: !!localStorage.getItem('token'),
+const TOKEN_KEY   = 'access_token';
+const REFRESH_KEY = 'refresh_token';
+const ROLE_KEY    = 'user_role';
 
-  login: (token) => {
-    localStorage.setItem('token', token);
-    set({ token, isAuthenticated: true });
+export const useAuthStore = create((set, get) => ({
+  token:           localStorage.getItem(TOKEN_KEY)   || null,
+  refreshToken:    localStorage.getItem(REFRESH_KEY) || null,
+  role:            localStorage.getItem(ROLE_KEY)    || null,
+  isAuthenticated: !!localStorage.getItem(TOKEN_KEY),
+
+  // Вызывается после успешного login
+  setTokens: ({ access_token, refresh_token, role }) => {
+    localStorage.setItem(TOKEN_KEY,   access_token);
+    localStorage.setItem(REFRESH_KEY, refresh_token);
+    localStorage.setItem(ROLE_KEY,    role ?? 'parent');
+    set({
+      token:           access_token,
+      refreshToken:    refresh_token,
+      role:            role ?? 'parent',
+      isAuthenticated: true,
+    });
   },
 
-  logout: () => {
-    localStorage.removeItem('token');
-    set({ token: null, isAuthenticated: false });
-  }
+  // Тихое обновление access-токена
+  refreshAccessToken: async () => {
+    const refresh_token = get().refreshToken;
+    if (!refresh_token) return false;
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/refresh`,
+        {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ refresh_token }),
+        }
+      );
+      if (!res.ok) {
+        get().logout();
+        return false;
+      }
+      const data = await res.json();
+      localStorage.setItem(TOKEN_KEY,   data.access_token);
+      localStorage.setItem(REFRESH_KEY, data.refresh_token);
+      set({ token: data.access_token, refreshToken: data.refresh_token });
+      return true;
+    } catch {
+      get().logout();
+      return false;
+    }
+  },
+
+  logout: async () => {
+    const refresh_token = get().refreshToken;
+    const token         = get().token;
+    // Отзываем refresh-токен на сервере (best-effort)
+    if (refresh_token && token) {
+      fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+        method:  'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ refresh_token }),
+      }).catch(() => {});
+    }
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_KEY);
+    localStorage.removeItem(ROLE_KEY);
+    set({ token: null, refreshToken: null, role: null, isAuthenticated: false });
+  },
 }));
