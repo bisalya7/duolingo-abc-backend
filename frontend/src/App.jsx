@@ -46,7 +46,8 @@ export default function App() {
         <Route path="/auth" element={<PublicRoute><AuthPage /></PublicRoute>} />
 
         {/* Parent + Child flow */}
-        <Route path="/select"    element={<PrivateRoute allowedRoles={['parent']}><ChildSelector /></PrivateRoute>} />
+        <Route path="/select" element={<PrivateRoute allowedRoles={['parent']}><ChildSelector /></PrivateRoute>} />
+        <Route path="/onboarding" element={<PrivateRoute allowedRoles={['parent']}><OnboardingFlow /></PrivateRoute>} />
         <Route path="/dashboard" element={<PrivateRoute allowedRoles={['parent', 'admin']}><ParentDashboard /></PrivateRoute>} />
 
         <Route path="/child/:childId/map"

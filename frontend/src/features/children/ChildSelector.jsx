@@ -31,7 +31,10 @@ export default function ChildSelector() {
     try {
       const data = await api.getChildren();
       setChildren(data);
-      if (data.length === 0) setShowAddForm(true);
+      if (data.length === 0) {
+        navigate('/onboarding');
+        return;
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -236,7 +239,6 @@ export default function ChildSelector() {
               </div>
             </div>
 
-            {/* Кнопки */}
             <div className="flex gap-3 pt-2">
               <button
                 type="submit"
