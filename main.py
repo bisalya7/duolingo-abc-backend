@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import engine, get_db
 from routers import auth, children, learning, admin, parents, notifications
+from celery_app import celery_app
 import schemas
 
 models.Base.metadata.create_all(bind=engine)
@@ -16,6 +17,18 @@ app = FastAPI(
     redoc_url="/api/v1/redoc",    # ReDoc под /api/v1/redoc
     openapi_url="/api/v1/openapi.json"
 )
+@app.get("/api/v1/health/celery")
+def celery_health():
+    """Проверка статуса Celery workers"""
+    try:
+        inspect = celery_app.control.inspect()
+        active = inspect.active()
+        return {
+            "status": "ok",
+            "workers": list(active.keys()) if active else [],
+        }
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,7 +42,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(children.router, prefix="/api/v1")
 app.include_router(learning.router, prefix="/api/v1")
-app.include_router(admin.router, prefix="/api/v1")
+app.include_router(admin.router)          
 app.include_router(parents.router, prefix="/api/v1")
 app.include_router(notifications.router, prefix="/api/v1")
 
